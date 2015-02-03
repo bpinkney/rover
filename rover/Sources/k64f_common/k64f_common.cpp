@@ -24,6 +24,7 @@ Mutex ext_mag_mutex;
 k64f_acc_data_t k64f_acc_data = {0,0,0};
 k64f_mag_data_t k64f_mag_data = {0,0,0};
 ext_gyro_data_t ext_gyro_data = {0,0,0};
+ext_gyro_temp_t ext_gyro_temp = {0};
 ext_acc_data_t ext_acc_data = {0,0,0};
 ext_mag_data_t ext_mag_data = {0,0,0};
 
@@ -62,6 +63,17 @@ void get_ext_gyro_data(void* buffer, int size){
 void set_ext_gyro_data(ext_gyro_data_t value){
 	ext_gyro_mutex.lock();
 	ext_gyro_data = value;
+    ext_gyro_mutex.unlock();
+}
+
+void get_ext_gyro_temp(void* buffer, int size){
+    ext_gyro_mutex.lock();
+    memcpy(buffer, &ext_gyro_temp, size);
+    ext_gyro_mutex.unlock();
+}
+void set_ext_gyro_temp(ext_gyro_temp_t value){
+	ext_gyro_mutex.lock();
+	ext_gyro_temp = value;
     ext_gyro_mutex.unlock();
 }
 

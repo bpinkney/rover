@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;mbed_sandbox&apos; to &apos;rover&apos;" description="Rename resource &apos;mbed_sandbox&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/mbed_sandbox" name="rover" stamp="1421179354100" updateReferences="true"/>
+</session>

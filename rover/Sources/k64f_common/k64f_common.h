@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+//#include <unistd.h>
 #include <stdlib.h>
 
 #include <ctime>
@@ -52,6 +53,9 @@ void set_k64f_mag_data(k64f_mag_data_t value);
 void get_ext_gyro_data(void* buffer, int size);
 void set_ext_gyro_data(ext_gyro_data_t value);
 
+void get_ext_gyro_temp(void* buffer, int size);
+void set_ext_gyro_temp(ext_gyro_temp_t value);
+
 void get_ext_acc_data(void* buffer, int size);
 void set_ext_acc_data(ext_acc_data_t value);
 
@@ -59,6 +63,8 @@ void get_ext_mag_data(void* buffer, int size);
 void set_ext_mag_data(ext_mag_data_t value);
 
 //macros
+#define LP_FILT(var, new_val, N)  \
+  do { var = ((float)var * ((float)N) + ((float)new_val)) / ((float)N+1); } while(false)
 
 #endif
 

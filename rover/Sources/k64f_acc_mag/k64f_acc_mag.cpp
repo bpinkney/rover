@@ -17,13 +17,18 @@ void k64f_sensor_interface::init(){
 }
 
 int k64f_sensor_interface::fetch_sensor_data(){
+
 	k64f_acc.getAxis(acc_raw);
 	k64f_mag.getAxis(mag_raw);
 	set_k64f_acc_data({
-		(float)acc_raw.x*FXOS8700Q_00_LSB,
-		(float)acc_raw.y*FXOS8700Q_00_LSB,
-		(float)acc_raw.z*FXOS8700Q_00_LSB});
-	set_k64f_mag_data({mag_raw.x, mag_raw.y, mag_raw.z});
+		(float)((float)acc_raw.x*FXOS8700Q_00_LSB*1.003748557 - 0.0465),
+		(float)((float)acc_raw.y*FXOS8700Q_00_LSB*0.984794786 - 0.0720),
+		(float)((float)acc_raw.z*FXOS8700Q_00_LSB*0.996061268 - 0.0543)});
+	set_k64f_mag_data({
+		(float)(((float)mag_raw.x - 53.0)*0.9791),
+		(float)(((float)mag_raw.y - 17.0)*1.0006),
+		(float)(((float)mag_raw.z - 806.0)*1.0212)
+	});
 	return 0;
 }
 

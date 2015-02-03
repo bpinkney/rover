@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;mbed_sandbox/Sources/k64f_acc_mag/ob_acc_mag.cpp&apos; to &apos;k64f_acc_mag.cpp&apos;" description="Rename resource &apos;ob_acc_mag.cpp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Sources/k64f_acc_mag/ob_acc_mag.cpp" name="k64f_acc_mag.cpp" stamp="1419271613596" updateReferences="true"/>
+</session>

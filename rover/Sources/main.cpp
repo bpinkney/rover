@@ -1,6 +1,7 @@
 
 #include "mbed.h"
 #include "rtos.h"
+#include "esc.h"
 
 #include <time.h>
 
@@ -37,6 +38,7 @@ SDFileSystem sd(PTE3, PTE1, PTE2, PTE4, "sdcard");
 //ofstream log_fp;
 
 //uptime
+const uint16_t imu_read_period = 10;
 uint32_t sw_uptime = 0;
 
 uint8_t status = 0;
@@ -164,9 +166,10 @@ void tick_clock(void const *n){
 
 
 void fetch_sensor_data(void const *n){
-	sw_uptime+=10;
+	sw_uptime+=imu_read_period;
 	int_imu.fetch_sensor_data();
 	ext_imu.readGyros();
+	ext_imu.readGyroTemp();
 	ext_imu.readAccs();
 	ext_imu.readMags();
 }
@@ -178,12 +181,12 @@ void run_core_sensors_thread(void const *args){
 	pc.printf("Start Sensors...\n");
 	int_imu.init();
 	ext_sensor_ack = ext_imu.init();
-	pc.printf("\r\n\nIMU Init Ack= %d\r\n", ext_sensor_ack);
+	pc.printf("\r\n\nIMUS: External IMU Init Ack = %d\r\n", ext_sensor_ack);
 	RtosTimer imu_timer(fetch_sensor_data, osTimerPeriodic, (void *)0);
 	//RtosTimer print_timer(print_sensor_data, osTimerPeriodic, (void *)1);
 
 	if(ext_sensor_ack == 0){
-		imu_timer.start(10);
+		imu_timer.start(imu_read_period);
 	}else{
 		status = 33;
 		pc.printf("External IMU could not be started!!\n\r");
@@ -198,10 +201,83 @@ void run_core_sensors_thread(void const *args){
 }
 
 void run_estimator_thread(void const *args){
+
+	/*RtosTimer imu_timer(fetch_sensor_data, osTimerPeriodic, (void *)0);
+	//RtosTimer print_timer(print_sensor_data, osTimerPeriodic, (void *)1);
+
+	if(ext_sensor_ack == 0){
+		imu_timer.start(imu_read_period);
+	}else{
+		status = 33;
+		pc.printf("External IMU could not be started!!\n\r");
+	}*/
+
 	while(true){Thread::wait(osWaitForever);}
 }
 
 void run_motor_control_thread(void const *args){
+
+	pc.printf("MOTORS: initilaize ESCs\n\r");
+
+	uint8_t calibrate_motor_range = 1;
+	ESC m1(PTA1);
+	ESC m2(PTA2);
+	ESC m3(PTC2);
+	ESC m4(PTC3);
+
+	float throttle_var = 0.0; //0.5 means 50%.
+
+	pc.printf("ESC intialized\n\r");
+	pc.printf("set init throttle to : %f\n\r", throttle_var);
+	uint32_t init_time = 0;
+
+
+	throttle_var = 0.0;
+	pc.printf("set throttle to : %f\n\r", throttle_var);
+	while(1)
+		{
+		if(init_time < 10000){//wait for init of ESCs
+			throttle_var = 0.0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 15000){
+			throttle_var = 0.2;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 20000){
+			throttle_var = 0.3;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 25000){
+			throttle_var = 0.4;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 30000){
+			throttle_var = 0.5;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 35000){
+			throttle_var = 0.6;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 40000){
+			throttle_var = 0.7;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}
+		else if(init_time < 45000){
+			throttle_var = 0.0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}
+
+			//... update throttle_var ...
+
+			//esc1 = throttle_var; //memorize the throttle value (it doesn't send it to the ESC).
+
+			//... do whatever you want - e.g. call esc1.setThrottle(throttle_var) again ...
+
+			//esc1(); //actually sets the throttle to the ESC.
+
+			Thread::wait(20);  //20ms is the default period of the ESC pwm; the ESC may not run faster.
+
+			init_time+=20;
+
+		}
+
+
 	while(true){Thread::wait(osWaitForever);}
 }
 
@@ -214,6 +290,22 @@ void run_nav_sensor_thread(void const *args){
 }
 
 void run_remote_control_thread(void const *args){
+	pc.printf("RADIO: Start Radio Serial\r\n");
+	Serial pc_rad(PTC17, PTC16); // tx, rx
+	pc_rad.baud(57000); //only baud rate accepted by radios
+
+	pc_rad.printf("Welcome to ROVER Remote Logging and Control\n\r");
+	pc.printf("RADIO: Polling for remote chars...\r\n");
+	uint8_t c;
+	while(1) {
+		if(pc_rad.readable()) {
+			c = pc_rad.getc();
+			pc.printf("Radio chars recieved: '%d'\n\r", c);
+		}else{
+			Thread::wait(200);
+		}
+	}
+
 	while(true){Thread::wait(osWaitForever);}
 }
 
@@ -239,6 +331,7 @@ void run_flight_logger_thread(void const *args){
 	ext_mag_data_t emd = {0,0,0};
 	ext_acc_data_t ead = {0,0,0};
 	ext_gyro_data_t egd = {0,0,0};
+	ext_gyro_temp_t egt = {0};
 	k64f_acc_data_t iad = {0,0,0};
 	k64f_mag_data_t imd = {0,0,0};
 
@@ -265,8 +358,8 @@ void run_flight_logger_thread(void const *args){
 			date_stamp,
 			"Flight Log #", log_number,
 			"ROVER: 'Rover Observation Vehicle for Enclosed Regions'",
-			"Flight Log - Format Version '0.1'",
-			"LEGEND:[rover_t, rover_status, [rover_orient], [rover_ex_gyro], [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag]]");
+			"Flight Log - Format Version '0.2'",
+			"LEGEND:[rover_t, rover_status, [rover_orient], [rover_ex_gyro], rover_ex_gyro_temp, [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag]]");
 
 	log_fp = fopen(filename, "w");
 	if (log_fp == NULL) {
@@ -291,13 +384,15 @@ void run_flight_logger_thread(void const *args){
 				get_ext_mag_data(&emd, sizeof(emd));
 				get_ext_acc_data(&ead, sizeof(ead));
 				get_ext_gyro_data(&egd, sizeof(egd));
+				get_ext_gyro_temp(&egt, sizeof(egt));
 				get_k64f_acc_data(&iad, sizeof(iad));
 				get_k64f_mag_data(&imd, sizeof(imd));
 
 				sprintf(log_buffer,
-						"DATA[%d, 0, [0,0,0], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%d, %d, %d]]\n",
+						"DATA[%d, 0, [0,0,0], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]\n",
 						sw_uptime,
 						egd.x, egd.y, egd.z,
+						egt.temp_c,
 						ead.x, ead.y, ead.z,
 						iad.x, iad.y, iad.z,
 						emd.x, emd.y, emd.z,
@@ -342,7 +437,7 @@ int start_operating_threads(){
 	estimator_thread = new Thread(run_estimator_thread, NULL, osPriorityRealtime);
 
 	// drives the motors based on input from the flight controller
-	motor_control_thread = new Thread(run_motor_control_thread, NULL, osPriorityRealtime);
+	//motor_control_thread = new Thread(run_motor_control_thread, NULL, osPriorityRealtime);
 
 	// flight controller which handles basic movement commands
 	// and updates motor_control speeds according to flight settings and estimator
@@ -357,7 +452,7 @@ int start_operating_threads(){
 
 	// receives data from the telemetry radio  = new Thread(mutexed serial)
 	// and sends it to the position controller  = new Thread(includes kill commands)
-	remote_control_thread = new Thread(run_nav_sensor_thread, NULL, osPriorityAboveNormal);
+	remote_control_thread = new Thread(run_remote_control_thread, NULL, osPriorityRealtime);
 
 	// controls the position of the flyer and perturbates the
 	// flight controller to allow for movement  = new Thread(based on nav sensors and radio_rx)
