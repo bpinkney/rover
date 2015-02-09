@@ -43,11 +43,11 @@ struct ext_mag_data_t{//__attribute__ ((__packed__)) {
     float z;
 };
 
-//external gyro
-struct gyro_orientation_t{//__attribute__ ((__packed__)) {
-    float x;
-    float y;
-    float z;
+//orientation estimation in radians
+struct craft_orientation_est_t{//__attribute__ ((__packed__)) {
+    float roll;//y
+    float pitch;//x
+    float yaw;
 };
 
 

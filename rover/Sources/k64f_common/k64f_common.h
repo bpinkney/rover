@@ -62,6 +62,9 @@ void set_ext_acc_data(ext_acc_data_t value);
 void get_ext_mag_data(void* buffer, int size);
 void set_ext_mag_data(ext_mag_data_t value);
 
+void get_craft_orientation_est(void* buffer, int size);
+void set_craft_orientation_est(craft_orientation_est_t value);
+
 //macros
 #define LP_FILT(var, new_val, N)  \
   do { var = ((float)var * ((float)N) + ((float)new_val)) / ((float)N+1); } while(false)

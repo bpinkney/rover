@@ -11,9 +11,6 @@
 #include "k64f_acc_mag.h"
 #include "IMU.h"
 
-//turnigy multistar operates at 8kHz PWM
-float pwm_period = 1/10;
-
 //define thread pointers
 Thread *core_sensors_thread;
 Thread *estimator_thread;
@@ -37,11 +34,22 @@ SDFileSystem sd(PTE3, PTE1, PTE2, PTE4, "sdcard");
 
 //ofstream log_fp;
 
+//estimator trusts
+float gyro_trust = 0.9;
+float acc_trust = 1-gyro_trust;
+
 //uptime
 const uint16_t imu_read_period = 10;
+const uint16_t estimator_period = 10;
 uint32_t sw_uptime = 0;
 
 uint8_t status = 0;
+
+//temp
+float ext_throttle = 0.0;
+int8_t ext_yaw = 0;
+int8_t ext_pitch = 0;
+int8_t ext_roll = 0;
 
 //buffers
 //char log_buffer[1024];
@@ -144,26 +152,10 @@ void show_status_led_thread(void const *args) {
 	}
 }
 
-void driveMotor(void const *args) {//not working yet
-	PwmOut motor1(PTA0);
-	motor1.pulsewidth(pwm_period);
-	motor1.period(pwm_period);
-
-
-	float pe;
-	while(true){
-		pe= motor1.read();
-		//pc.printf("A read= %f\n\r", pe);
-		Thread::wait(1);
-	}
-}
-
-
 //RTOS timer class access functions
 void tick_clock(void const *n){
 	sw_uptime++;
 }
-
 
 void fetch_sensor_data(void const *n){
 	sw_uptime+=imu_read_period;
@@ -200,17 +192,61 @@ void run_core_sensors_thread(void const *args){
 	pc.printf("Thread Ended Prematurely!");
 }
 
+void update_estimator(void const *n){
+	/*
+	 * gyro_est(i, 1) = (gyro_x(i, 1))*time_d(i)/1000;
+  gyro_est(i, 2) = (gyro_y(i, 1))*time_d(i)/1000;
+
+  acc_est(i, 1) = atan2(acc_x(i, 1),sqrt(acc_y(i, 1)^2 + acc_z(i, 1)^2));
+  acc_est(i, 2) = atan2(acc_y(i, 1),sqrt(acc_x(i, 1)^2 + acc_z(i, 1)^2));
+
+  overall_est(i, :) = gyro_trust*(overall_est(i-1, :) + gyro_est(i, :)) + acc_est(i, :)*acc_trust;
+
+
+
+  and for mag
+  Rx = [1 0 0; 0 cos(pitch) sin(pitch); 0 -sin(pitch) -cos(pitch)];
+Ry = [cos(roll) 0 -sin(roll); 0 1 0; sin(roll) 0 cos(roll)];
+corrected_mag = Rx*Ry*flight_log_data.rover_int_mag(i, :)';
+yaw_est(i,1) = atan2(corrected_mag(2,1),corrected_mag(1,1));
+
+results in:
+x =    magx*cos(rol) - magz*sin(rol)
+y =    magy*cos(pit) + magz*cos(rol)*sin(pit) + magx*sin(pit)*sin(rol)
+z =  - magy*sin(pit) - magz*cos(pit)*cos(rol) - magx*cos(pit)*sin(rol)
+
+yaw = atan2(y,x)
+
+	 */
+	float pitch, roll, yaw; //(x, y, z), check the flyer and imu axes if you need to verify
+
+	ext_gyro_data_t egd = {0,0,0};
+	k64f_acc_data_t iad = {0,0,0};
+	k64f_mag_data_t imd = {0,0,0};
+	craft_orientation_est_t o_orient = {0,0,0};
+	//craft_orientation_est_t n_orient = {0,0,0};
+
+	get_ext_gyro_data(&egd, sizeof(egd));
+	get_k64f_acc_data(&iad, sizeof(iad));
+	get_k64f_mag_data(&imd, sizeof(imd));
+	get_craft_orientation_est(&o_orient, sizeof(o_orient));
+
+	pitch = gyro_trust*(o_orient.pitch + (egd.x*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.x,sqrt(pow(iad.y,2) + pow(iad.z,2)));
+	roll = gyro_trust*(o_orient.roll + (egd.y*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.y,sqrt(pow(iad.x,2) + pow(iad.z,2)));
+
+	yaw = atan2((imd.y*cos(pitch) + imd.z*cos(roll)*sin(pitch) + imd.x*sin(pitch)*sin(roll)),(imd.x*cos(roll) - imd.x*sin(roll)));
+
+	set_craft_orientation_est({roll, pitch, yaw}); //radians
+
+	//pc.printf("Orient Est [RPY]: %f, %f, %f\n\r", roll, pitch, yaw);
+}
+
 void run_estimator_thread(void const *args){
 
-	/*RtosTimer imu_timer(fetch_sensor_data, osTimerPeriodic, (void *)0);
-	//RtosTimer print_timer(print_sensor_data, osTimerPeriodic, (void *)1);
+	RtosTimer estimator_timer(update_estimator, osTimerPeriodic, (void *)0);
 
-	if(ext_sensor_ack == 0){
-		imu_timer.start(imu_read_period);
-	}else{
-		status = 33;
-		pc.printf("External IMU could not be started!!\n\r");
-	}*/
+	pc.printf("Starting Estimator\n\r");
+	estimator_timer.start(estimator_period);
 
 	while(true){Thread::wait(osWaitForever);}
 }
@@ -225,51 +261,128 @@ void run_motor_control_thread(void const *args){
 	ESC m3(PTC2);
 	ESC m4(PTC3);
 
+	uint8_t m1_on = 1;
+	uint8_t m2_on = 1;
+	uint8_t m3_on = 1;
+	uint8_t m4_on = 1;
+
+	float m1_throttle = 0.0;
+	float m2_throttle = 0.0;
+	float m3_throttle = 0.0;
+	float m4_throttle = 0.0;
+
 	float throttle_var = 0.0; //0.5 means 50%.
 
 	pc.printf("ESC intialized\n\r");
 	pc.printf("set init throttle to : %f\n\r", throttle_var);
 	uint32_t init_time = 0;
-
-
 	throttle_var = 0.0;
-	pc.printf("set throttle to : %f\n\r", throttle_var);
+
 	while(1)
 		{
-		if(init_time < 10000){//wait for init of ESCs
-			throttle_var = 0.0;
+		if(init_time < 5000){//wait for init of ESCs
+			m1_throttle = 1;
+			m2_throttle = 1;
+			m3_throttle = 1;
+			m4_throttle = 1;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
-		}else if(init_time < 15000){
+		}else if(init_time < 10000){
+			m1_throttle = 0;
+			m2_throttle = 0;
+			m3_throttle = 0;
+			m4_throttle = 0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else{
+			m1_throttle = ext_throttle + 0.02*ext_yaw + 0.02*ext_pitch + 0.02*ext_roll;	//FL
+			m2_throttle = ext_throttle - 0.02*ext_yaw + 0.02*ext_pitch - 0.02*ext_roll; //FR
+			m3_throttle = ext_throttle + 0.02*ext_yaw - 0.02*ext_pitch - 0.02*ext_roll; //RR
+			m4_throttle = ext_throttle - 0.02*ext_yaw - 0.02*ext_pitch + 0.02*ext_roll; //RL
+		}
+
+		/*else if(init_time < 15000){
 			throttle_var = 0.2;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}else if(init_time < 20000){
-			throttle_var = 0.3;
-			//pc.printf("set throttle to : %f\n\r", throttle_var);
-		}else if(init_time < 25000){
 			throttle_var = 0.4;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}
+		else if(init_time < 11000){
+			throttle_var = 0.0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else{
+			throttle_var = ext_throttle;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}else if(init_time < 25000){
+			throttle_var = 0.0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}else if(init_time < 30000){
-			throttle_var = 0.5;
+			throttle_var = 0.2;
+			m1_on = 1;
+			m2_on = 0;
+			m3_on = 0;
+			m4_on = 0;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}else if(init_time < 35000){
-			throttle_var = 0.6;
+			throttle_var = 0.2;
+			m1_on = 0;
+			m2_on = 1;
+			m3_on = 0;
+			m4_on = 0;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}else if(init_time < 40000){
-			throttle_var = 0.7;
+			throttle_var = 0.2;
+			m1_on = 0;
+			m2_on = 0;
+			m3_on = 1;
+			m4_on = 0;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}
 		else if(init_time < 45000){
-			throttle_var = 0.0;
+			throttle_var = 0.2;
+			m1_on = 0;
+			m2_on = 0;
+			m3_on = 0;
+			m4_on = 1;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}
+		else if(init_time < 50000){
+			throttle_var = 0.2;
+			m1_on = 0;
+			m2_on = 1;
+			m3_on = 0;
+			m4_on = 1;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}
+		else if(init_time < 55000){
+			throttle_var = 0.2;
+			m1_on = 1;
+			m2_on = 0;
+			m3_on = 1;
+			m4_on = 0;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}
+		else if(init_time < 60000){
+			throttle_var = 0.0;
+			m1_on = 1;
+			m2_on = 1;
+			m3_on = 1;
+			m4_on = 1;
+			//pc.printf("set throttle to : %f\n\r", throttle_var);
+		}*/
 
 			//... update throttle_var ...
-
-			//esc1 = throttle_var; //memorize the throttle value (it doesn't send it to the ESC).
+			//memorize the throttle value (it doesn't send it to the ESC).
+			if(m1_on){m1 = m1_throttle;}else{m1 = 0;}
+			if(m2_on){m2 = m2_throttle;}else{m2 = 0;}
+			if(m3_on){m3 = m3_throttle;}else{m3 = 0;}
+			if(m4_on){m4 = m4_throttle;}else{m4 = 0;}
 
 			//... do whatever you want - e.g. call esc1.setThrottle(throttle_var) again ...
 
-			//esc1(); //actually sets the throttle to the ESC.
+			m1(); //actually sets the throttle to the ESC.
+			m2();
+			m3();
+			m4();
 
 			Thread::wait(20);  //20ms is the default period of the ESC pwm; the ESC may not run faster.
 
@@ -291,9 +404,9 @@ void run_nav_sensor_thread(void const *args){
 
 void run_remote_control_thread(void const *args){
 	pc.printf("RADIO: Start Radio Serial\r\n");
+	//telemetry serial in/out (57000 baud, set in remote thread)
 	Serial pc_rad(PTC17, PTC16); // tx, rx
 	pc_rad.baud(57000); //only baud rate accepted by radios
-
 	pc_rad.printf("Welcome to ROVER Remote Logging and Control\n\r");
 	pc.printf("RADIO: Polling for remote chars...\r\n");
 	uint8_t c;
@@ -301,6 +414,18 @@ void run_remote_control_thread(void const *args){
 		if(pc_rad.readable()) {
 			c = pc_rad.getc();
 			pc.printf("Radio chars recieved: '%d'\n\r", c);
+			if(c == 'w' && ext_throttle <= 0.9){
+				ext_throttle = ext_throttle + 0.05;
+				pc.printf("Throttle set to: '%f' percent.\n\r", ext_throttle);
+			}
+			else if(c == 's' && ext_throttle >= 0.1){
+				ext_throttle = ext_throttle - 0.05;
+				pc.printf("Throttle set to: '%f' percent.\n\r", ext_throttle);
+			}
+			else if(c == 'k'){
+				ext_throttle = 0;
+				pc.printf("Throttle Killed\n\r");
+			}
 		}else{
 			Thread::wait(200);
 		}
@@ -334,6 +459,7 @@ void run_flight_logger_thread(void const *args){
 	ext_gyro_temp_t egt = {0};
 	k64f_acc_data_t iad = {0,0,0};
 	k64f_mag_data_t imd = {0,0,0};
+	craft_orientation_est_t o_orient = {0,0,0};
 
 	pc.printf("Flight Log Starting...\n\r");
 	wait(2);
@@ -387,10 +513,12 @@ void run_flight_logger_thread(void const *args){
 				get_ext_gyro_temp(&egt, sizeof(egt));
 				get_k64f_acc_data(&iad, sizeof(iad));
 				get_k64f_mag_data(&imd, sizeof(imd));
+				get_craft_orientation_est(&o_orient, sizeof(o_orient));
 
 				sprintf(log_buffer,
-						"DATA[%d, 0, [0,0,0], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]\n",
+						"DATA[%d, 0, [%f,%f,%f], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]\n",
 						sw_uptime,
+						o_orient.roll, o_orient.pitch, o_orient.yaw,
 						egd.x, egd.y, egd.z,
 						egt.temp_c,
 						ead.x, ead.y, ead.z,

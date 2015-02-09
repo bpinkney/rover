@@ -108,7 +108,7 @@ char IMU::readGyros(){
 	char ack, reg, D[6];
 	int16_t W[3];
 	float x, y, z;
-	//ext_gyro_data_t oegd = {0,0,0};
+	ext_gyro_data_t oegd = {0,0,0};
 	//int16_t temp;
 
 	// report the data in rad/s
@@ -123,19 +123,18 @@ char IMU::readGyros(){
 
 	//get_ext_gyro_temp(&temp, sizeof(temp));
 
-	x = (float)W[0]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS - 0.000618;// - (float)(0.002171*((float)temp) - 0.044515);//(float) 0.971*(W[0]-L3GD20_biasX)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
-	y = (float)W[1]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS + 0.009710;// - (float)(-0.000237791*((float)temp) + 0.006740119);//(float) 0.998*(W[1]-L3GD20_biasY)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
-	z = (float)W[2]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS + 0.010849;// - (float)(-0.001434761*((float)temp) + 0.032907619);//(float) 1.002*(W[2]-L3GD20_biasZ)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	x = -((float)W[0]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS - 0.000618);// - (float)(0.002171*((float)temp) - 0.044515);//(float) 0.971*(W[0]-L3GD20_biasX)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	y = ((float)W[1]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS + 0.009710);// - (float)(-0.000237791*((float)temp) + 0.006740119);//(float) 0.998*(W[1]-L3GD20_biasY)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	z = -((float)W[2]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS + 0.010849);// - (float)(-0.001434761*((float)temp) + 0.032907619);//(float) 1.002*(W[2]-L3GD20_biasZ)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
 
-	//get_ext_gyro_data(&oegd, sizeof(oegd));
+	get_ext_gyro_data(&oegd, sizeof(oegd));
 
 	//filter (iir lowpass, N = 10) //replace later
-	//LP_FILT(oegd.x, x, 10);
-	//LP_FILT(oegd.y, y, 10);
-	//L/P_FILT(oegd.z, z, 10);
+	LP_FILT(oegd.x, x, 10);
+	LP_FILT(oegd.y, y, 10);
+	LP_FILT(oegd.z, z, 10);
 
-
-	set_ext_gyro_data({x, y, z});
+	set_ext_gyro_data({oegd.x, oegd.y, oegd.z});
 
 	return ack;
 }

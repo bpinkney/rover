@@ -3,6 +3,7 @@
 //usb serial out (9600 baud)
 Serial pc(USBTX, USBRX);
 
+
 //internal i2c bus for acc and mag
 FXOS8700Q_acc k64f_acc(PTE25, PTE24, FXOS8700CQ_SLAVE_ADDR1); // Proper Ports and I2C Address for K64F Freedom board
 FXOS8700Q_mag k64f_mag(PTE25, PTE24, FXOS8700CQ_SLAVE_ADDR1); // Proper Ports and I2C Address for K64F Freedom board
@@ -13,12 +14,15 @@ FXOS8700Q_mag k64f_mag(PTE25, PTE24, FXOS8700CQ_SLAVE_ADDR1); // Proper Ports an
 //external (adafruit) accel and mag, gyro, baro and temp
 //IMU ext_imu(PTE25,PTE24);
 
+
+
 //data struct mutexes (why not have a crapload? a hit of RAM now for free threads later)
 Mutex k64f_acc_mutex;
 Mutex k64f_mag_mutex;
 Mutex ext_gyro_mutex;
 Mutex ext_acc_mutex;
 Mutex ext_mag_mutex;
+Mutex orient_est_mutex;
 
 //data struct global iterations
 k64f_acc_data_t k64f_acc_data = {0,0,0};
@@ -27,6 +31,7 @@ ext_gyro_data_t ext_gyro_data = {0,0,0};
 ext_gyro_temp_t ext_gyro_temp = {0};
 ext_acc_data_t ext_acc_data = {0,0,0};
 ext_mag_data_t ext_mag_data = {0,0,0};
+craft_orientation_est_t craft_orientation_est = {0,0,0};
 
 //data struct getters and setters
 void get_k64f_acc_data(void* buffer, int size){
@@ -102,6 +107,18 @@ void set_ext_mag_data(ext_mag_data_t value){
 	ext_mag_data = value;
     ext_mag_mutex.unlock();
 }
+
+void get_craft_orientation_est(void* buffer, int size){
+	orient_est_mutex.lock();
+    memcpy(buffer, &craft_orientation_est, size);
+    orient_est_mutex.unlock();
+}
+void set_craft_orientation_est(craft_orientation_est_t value){
+	orient_est_mutex.lock();
+	craft_orientation_est = value;
+	orient_est_mutex.unlock();
+}
+
 
 //macros
 
