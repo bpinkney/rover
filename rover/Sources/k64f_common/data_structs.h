@@ -50,5 +50,20 @@ struct craft_orientation_est_t{//__attribute__ ((__packed__)) {
     float yaw;
 };
 
+//desired orientation in radians
+struct craft_orientation_des_t{//__attribute__ ((__packed__)) {
+    float roll;//y
+    float pitch;//x
+    float yaw;
+};
+
+//desired motor thrusts, range[0:1] (0 - 100% thrust) ~ thrust * 10000 RPM w/turnigy 935s and 3S battery
+struct motor_thrust_des_t{//__attribute__ ((__packed__)) {
+    float fl;//
+    float fr;
+    float rr;
+    float rl;
+};
+
 
 #endif

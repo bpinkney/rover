@@ -23,6 +23,8 @@ Mutex ext_gyro_mutex;
 Mutex ext_acc_mutex;
 Mutex ext_mag_mutex;
 Mutex orient_est_mutex;
+Mutex orient_des_mutex;
+Mutex motor_thrust_des_mutex;
 
 //data struct global iterations
 k64f_acc_data_t k64f_acc_data = {0,0,0};
@@ -32,6 +34,8 @@ ext_gyro_temp_t ext_gyro_temp = {0};
 ext_acc_data_t ext_acc_data = {0,0,0};
 ext_mag_data_t ext_mag_data = {0,0,0};
 craft_orientation_est_t craft_orientation_est = {0,0,0};
+craft_orientation_des_t craft_orientation_des = {0,0,0};
+motor_thrust_des_t motor_thrust_des = {0,0,0,0};
 
 //data struct getters and setters
 void get_k64f_acc_data(void* buffer, int size){
@@ -118,6 +122,29 @@ void set_craft_orientation_est(craft_orientation_est_t value){
 	craft_orientation_est = value;
 	orient_est_mutex.unlock();
 }
+
+void get_craft_orientation_des(void* buffer, int size){
+	orient_des_mutex.lock();
+    memcpy(buffer, &craft_orientation_des, size);
+    orient_des_mutex.unlock();
+}
+void set_craft_orientation_des(craft_orientation_des_t value){
+	orient_des_mutex.lock();
+	craft_orientation_des = value;
+	orient_des_mutex.unlock();
+}
+
+void get_motor_thrust_des(void* buffer, int size){
+	motor_thrust_des_mutex.lock();
+    memcpy(buffer, &motor_thrust_des, size);
+    motor_thrust_des_mutex.unlock();
+}
+void set_motor_thrust_des(motor_thrust_des_t value){
+	motor_thrust_des_mutex.lock();
+	motor_thrust_des = value;
+	motor_thrust_des_mutex.unlock();
+}
+
 
 
 //macros

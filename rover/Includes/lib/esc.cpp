@@ -11,7 +11,7 @@ ESC::ESC(const PinName pwmPinOut, const int period)
 bool ESC::setThrottle (const float t)
 {
     if (t >= 0.0 && t <= 1.0) {       // qualify range, 0-1
-        throttle = 1000.0*t + 1000;     // map to range, 1-2 ms (1000-2000us)
+        throttle = 1000.0*t +1000;     // map to range, 1-2 ms (1000-2000us)
         return true;
     }
     return false;
