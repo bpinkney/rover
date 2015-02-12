@@ -1,5 +1,5 @@
 if(~exist('flight_log_data', 'var'))
-    parse_flightlog_03('rover_flight_logs\rev_3\second_test_estimator.txt');
+    parse_flightlog_04('rover_flight_logs\rev_4\pf_pb_rr_rl_1.txt');
     global flight_log_data;
     flight_log_data.rover_t = flight_log_data.rover_t(1:max(size(flight_log_data.rover_ex_gyro)));
 end 
@@ -8,6 +8,7 @@ mag = 0;
 acc = 0;
 gyro = 0;
 est = 1;
+pids = 1;
 
 
 %% mag cal
@@ -264,13 +265,13 @@ end
 % title('Buttered');
 
 figure; hold on;
-plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(overall_est));
+%plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(overall_est));
 plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 2)), 'c');
 plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 1)), 'r');
-legend('Pitch Est', 'Roll Est', 'Pitch Est Onboard', 'Roll Est Onboard');
+legend('Pitch Est Onboard', 'Roll Est Onboard');
 ylabel('degrees');
 xlabel('seconds');
-end
+
 
 yaw_est = zeros(gyro_len-1, 1);
 yaw_est_uncorrected = zeros(gyro_len-1, 1);
@@ -288,15 +289,15 @@ yaw_est_uncorrected(i,1) = atan2(roll,pitch);
 %  
 end
 
-%rectify to full coord frame
+%rectify to full coord frame (doesn't really work well)
 yaw_crossedover = flight_log_data.rover_orient(:,3)+((flight_log_data.rover_orient(:,3) > 0).*(flight_log_data.rover_orient(:,3)-pi*3));
 yaw_crossedover_mat = yaw_est+((yaw_est > 0).*(yaw_est-pi*3));
 
 
 figure; hold on;
-plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(yaw_crossedover_mat), 'b');
+%plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(yaw_crossedover_mat), 'b');
 plot(flight_log_data.rover_t/1000, rad2deg(yaw_crossedover), 'r');
-legend('Yaw Est', 'Yaw Est Onboard');
+legend('Yaw Est Onboard');
 ylabel('degrees');
 xlabel('seconds');
 
@@ -325,7 +326,7 @@ for i = 2:gyro_len - 1
     level_frame_pos(i,:) = level_frame_pos(i-1,:)+ level_frame_vel(i-1,:).*time_d(i)/1000;
     
 end
-
+end
 %  figure;
 %  plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(level_frame_acc));
 %  legend('Prismatic Acceleration');
@@ -344,6 +345,36 @@ end
 % plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_int_acc));
 
 
+if(pids)
+    
+    roll_err = flight_log_data.rover_orient_des(:, 1) - flight_log_data.rover_orient(:, 1);
+    pitch_err = flight_log_data.rover_orient_des(:, 2) - flight_log_data.rover_orient(:, 2);
+    
+    figure;hold on;
+    plot(flight_log_data.rover_t/1000, roll_err, 'b');
+    plot(flight_log_data.rover_t/1000, pitch_err, 'r');
+    legend('Roll Err', 'Pitch Err');
+    
+    figure;hold on;
+    plot(flight_log_data.rover_t/1000, pitch_err, 'b');
+    plot(flight_log_data.rover_t/1000, pitch_err-roll_err, 'g');
+    plot(flight_log_data.rover_t/1000, pitch_err+roll_err, 'r');
+     legend('Pitch Err', 'FL', 'FR');
+    
+    figure;hold on;
+    plot(flight_log_data.rover_t/1000, pitch_err-roll_err, 'b');
+    plot(flight_log_data.rover_t/1000, pitch_err+roll_err, 'g');
+    plot(flight_log_data.rover_t/1000, -pitch_err+roll_err, 'r');
+    plot(flight_log_data.rover_t/1000, -pitch_err-roll_err, 'c');
+    legend('FL Prop', 'FR Prop', 'RR Prop', 'RL Prop');
+    title('theorectical');
+    
+    figure;
+    plot(flight_log_data.rover_t/1000, flight_log_data.rover_m_thrust);
+    legend('FL Prop', 'FR Prop', 'RR Prop', 'RL Prop');
+    title('actual');
+    
+end
 
 
 
