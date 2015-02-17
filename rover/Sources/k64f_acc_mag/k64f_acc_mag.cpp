@@ -26,6 +26,7 @@ int k64f_sensor_interface::fetch_sensor_data(){
 	k64f_acc.getAxis(acc_raw);
 	k64f_mag.getAxis(mag_raw);
 
+
 	//do maths
 	float acc_x = (float)((float)acc_raw.x*FXOS8700Q_00_LSB*1.003748557 - 0.0465);
 	float acc_y = (float)((float)acc_raw.y*FXOS8700Q_00_LSB*0.984794786 - 0.0720);

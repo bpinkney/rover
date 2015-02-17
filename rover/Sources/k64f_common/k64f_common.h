@@ -14,6 +14,7 @@
 #include "rtos.h"
 #include "FXOS8700Q.h"
 #include "SDFileSystem.h"
+#include <math.h>
 //#include "Adafruit_L3GD20.h"
 
 #include "data_structs.h"
@@ -27,6 +28,8 @@ extern Serial pc;
 //internal i2c bus for acc and mag
 extern FXOS8700Q_acc k64f_acc; // Proper Ports and I2C Address for K64F Freedom board
 extern FXOS8700Q_mag k64f_mag; // Proper Ports and I2C Address for K64F Freedom board
+
+
 
 //sd card
 //extern SDFileSystem sd;
@@ -74,6 +77,16 @@ void set_motor_thrust_des(motor_thrust_des_t value);
 //macros
 #define LP_FILT(var, new_val, N)  \
   do { var = ((float)var * ((float)N) + ((float)new_val)) / ((float)N+1); } while(false)
+
+#define WRAP_2PI(rad)		\
+  while ((rad) > M_PI/2)	\
+  {							\
+    rad -= M_PI;			\
+  }							\
+  while ((rad) < -M_PI/2)	\
+  {							\
+    rad += M_PI;			\
+  }							\
 
 #endif
 

@@ -9,6 +9,8 @@
 #include "k64f_common.h"
 //#include "k64f_io.h"
 #include "k64f_acc_mag.h"
+#include "flight_controller.h"
+#include "orientation_estimator.h"
 #include "IMU.h"
 
 //define thread pointers
@@ -32,15 +34,19 @@ IMU ext_imu(PTE25,PTE24);
 SDFileSystem sd(PTE3, PTE1, PTE2, PTE4, "sdcard");
 //logfile filedescriptor
 
-//ofstream log_fp;
+//orient estimator
+orientation_estimator_t orientation_estimator;
 
-//estimator trusts
-float gyro_trust = 0.9;
-float acc_trust = 1-gyro_trust;
+//flight_controller
+flight_controller_t flight_controller;
+
+//ofstream log_fp;
 
 //uptime
 const uint16_t imu_read_period = 10;
 const uint16_t estimator_period = 10;
+const uint16_t flight_control_inner_period = 10;
+const uint16_t flight_control_outer_period = 100;
 uint32_t sw_uptime = 0;
 
 uint8_t status = 0;
@@ -51,8 +57,8 @@ int8_t ext_yaw = 0;
 int8_t ext_pitch = 0;
 int8_t ext_roll = 0;
 
-float ext_rp = 0.5;
-float ext_pp = 0.5;
+float ext_rp = 0.00;
+float ext_pp = 0.00;
 
 //buffers
 //char log_buffer[1024];
@@ -196,6 +202,9 @@ void run_core_sensors_thread(void const *args){
 }
 
 void update_estimator(void const *n){
+
+	orientation_estimator.run_estimate_loop();
+
 	/*
 	 * gyro_est(i, 1) = (gyro_x(i, 1))*time_d(i)/1000;
   gyro_est(i, 2) = (gyro_y(i, 1))*time_d(i)/1000;
@@ -221,7 +230,7 @@ z =  - magy*sin(pit) - magz*cos(pit)*cos(rol) - magx*cos(pit)*sin(rol)
 yaw = atan2(y,x)
 
 	 */
-	float pitch, roll, yaw; //(x, y, z), check the flyer and imu axes if you need to verify
+	/*float pitch, roll, yaw; //(x, y, z), check the flyer and imu axes if you need to verify
 
 	ext_gyro_data_t egd = {0,0,0};
 	k64f_acc_data_t iad = {0,0,0};
@@ -237,14 +246,22 @@ yaw = atan2(y,x)
 	roll = gyro_trust*(o_orient.roll + (egd.x*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.x,sqrt(pow(iad.y,2) + pow(iad.z,2)));
 	pitch = gyro_trust*(o_orient.pitch + (egd.y*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.y,sqrt(pow(iad.x,2) + pow(iad.z,2)));
 
-	yaw = atan2((imd.y*cos(roll) + imd.z*cos(pitch)*sin(roll) + imd.x*sin(roll)*sin(pitch)),(imd.x*cos(pitch) - imd.x*sin(roll)));
+	yaw = atan2(imd.z*sin(pitch) - cos(pitch)*imd.y, cos(roll)*imd.x - imd.y*sin(pitch)*sin(roll) - cos(pitch)*imd.z*sin(roll));
+			//atan2(cos(pitch)*imd.y - imd.x*sin(pitch)*sin(roll) + cos(roll)*imd.z*sin(pitch), -imd.z*sin(roll) + cos(roll)*imd.x);
+	//atan2(imd.z*sin(pitch) - cos(pitch)*imd.y, cos(roll)*imd.x - imd.y*sin(pitch)*sin(roll) - cos(pitch)*imd.z*sin(roll))
 
-	set_craft_orientation_est({roll, pitch, yaw}); //radians
+	//atan2(cos(pitch)*conj(y) - conj(x)*sin(pitch)*sin(roll) + cos(roll)*conj(z)*sin(pitch), cos(roll)*conj(x) - conj(z)*sin(roll))
+	//old busted method (wrong axes) //= atan2((imd.y*cos(roll) + imd.z*cos(pitch)*sin(roll) + imd.x*sin(roll)*sin(pitch)),(imd.x*cos(pitch) - imd.x*sin(roll)));
+	//atan2(-cos(pitch)*imd.y - imd.x*sin(pitch)*sin(roll) - cos(roll)*imd.z*sin(pitch), imd.z*sin(roll) - cos(roll)*imd.x)
+	set_craft_orientation_est({roll, pitch, yaw}); //radians*/
 
 	//pc.printf("Orient Est [RPY]: %f, %f, %f\n\r", roll, pitch, yaw);
 }
 
 void run_estimator_thread(void const *args){
+
+	orientation_estimator.init();
+	orientation_estimator.imu_read_period = imu_read_period;
 
 	RtosTimer estimator_timer(update_estimator, osTimerPeriodic, (void *)0);
 
@@ -346,14 +363,25 @@ void run_motor_control_thread(void const *args){
 	while(true){Thread::wait(osWaitForever);}
 }
 
-void run_flight_control_thread(void const *args){
+void flight_control_inner_loop(void const *n){
+	flight_controller.run_inner_control_loop();
+}
 
-	float pitch_p = 1;
-	float pitch_i = 0;
+void run_flight_control_thread(void const *args){
+	flight_controller.init();
+
+	RtosTimer flight_control_timer(flight_control_inner_loop, osTimerPeriodic, (void *)0);
+
+	pc.printf("Starting Flight Controller\n\r");
+	flight_control_timer.start(flight_control_inner_period);
+
+
+	/*float pitch_p = 0.05;
+	float pitch_i = 0.001;
 	float pitch_d = 0;
 
-	float roll_p = 1;
-	float roll_i = 0;
+	float roll_p = 0.05;
+	float roll_i = 0.001;
 	float roll_d = 0;
 
 	float yaw_p = 0;
@@ -374,47 +402,62 @@ void run_flight_control_thread(void const *args){
 	float pitch_err, roll_err;
 	float pitch_thrust_delta, roll_thrust_delta;
 
+	uint32_t timestamp = sw_uptime-10;
 	float dt = 10;
 	//temp
-	float base_thrust = 0;
+	float base_thrust = 0;*/
 
-	while(true){
+	//while(true){
 		//loop
 
-		pitch_p = ext_pp;
+		/*pitch_p = ext_pp;
 		roll_p = ext_rp;//ext_rp;
 
 		get_craft_orientation_des(&orient_des, sizeof(orient_des));
 		get_craft_orientation_est(&orient_est, sizeof(orient_est));
 		//get_motor_thrust_des(&curr_motor_thrust, sizeof(curr_motor_thrust));
 
-		pitch_err = orient_des.pitch - orient_est.pitch;
-		roll_err = orient_des.roll - orient_est.roll;
-		//yaw_err = orient_des.yaw - orient_est.yaw; //account for crossover required
+		dt = (float)(sw_uptime-timestamp);//ms
+		if(dt!=0){
+			timestamp = sw_uptime;
 
-		//for 'I' term
-		pitch_err_integral = pitch_err_integral + pitch_err*dt;
-		roll_err_integral = roll_err_integral + roll_err*dt;
-		//yaw_err_integral = yaw_err_integral + yaw_err*dt;
+			pitch_err = orient_des.pitch - orient_est.pitch;
+			roll_err = orient_des.roll - orient_est.roll;
+			//yaw_err = orient_des.yaw - orient_est.yaw; //account for crossover required
 
-		//PIDs
-		pitch_thrust_delta = pitch_p*pitch_err/100;
-		// +  pitch_d*(pitch_err - pitch_err_previous)/dt + pitch_i*pitch_err_integral;
-		//to m/s since 10 ms is sampling period?
+			//for 'I' term
+			pitch_err_integral = pitch_err_integral + pitch_err*dt;
+			roll_err_integral = roll_err_integral + roll_err*dt;
+			//yaw_err_integral = yaw_err_integral + yaw_err*dt;
 
-		roll_thrust_delta = roll_p*roll_err/100;
-		//to m/s since 10 ms is sampling period?
+			//PIDs
+			pitch_thrust_delta =
+			pitch_p*pitch_err +
+			pitch_d*(pitch_err - pitch_err_previous)/dt +
+			pitch_i*pitch_err_integral;
 
-		set_motor_thrust_des({
-			ext_throttle + pitch_thrust_delta - roll_thrust_delta,//FL
-			ext_throttle + pitch_thrust_delta + roll_thrust_delta,//FR
-			ext_throttle - pitch_thrust_delta + roll_thrust_delta,//RR
-			ext_throttle - pitch_thrust_delta - roll_thrust_delta//RL
-		});
+			roll_thrust_delta =
+			roll_p*roll_err +
+			roll_d*(roll_err - roll_err_previous)/dt +
+			roll_i*roll_err_integral;
 
-		//for i+1 'D' term
-		pitch_err_previous = pitch_err;
-		roll_err_previous = roll_err;
+			yaw_thrust_delta =
+			yaw_p*yaw_err +
+			yaw_d*(yaw_err - yaw_err_previous)/dt +
+			yaw_i*yaw_err_integral;
+
+
+			set_motor_thrust_des({
+				ext_throttle + pitch_thrust_delta - roll_thrust_delta,// + yaw_thrust_delta,//FL
+				ext_throttle + pitch_thrust_delta + roll_thrust_delta,// - yaw_thrust_delta,//FR
+				ext_throttle - pitch_thrust_delta + roll_thrust_delta,// + yaw_thrust_delta,//RR
+				ext_throttle - pitch_thrust_delta - roll_thrust_delta,// - yaw_thrust_delta//RL
+			});
+
+			//for i+1 'D' term
+			pitch_err_previous = pitch_err;
+			roll_err_previous = roll_err;
+		}*/
 		//yaw_err_previous = yaw_err;
 
 
@@ -433,8 +476,8 @@ void run_flight_control_thread(void const *args){
 
 		//pc.printf("FLIGHT_CONTROL: Pitch thrust delta: %f, Roll thrust delta: %f\n\r", pitch_thrust_delta, roll_thrust_delta);
 
-		Thread::wait(10);
-	}
+		//Thread::wait(osWaitForever);
+	//}
 
 
 
@@ -469,16 +512,20 @@ void run_remote_control_thread(void const *args){
 			pc.printf("Radio chars recieved: '%d'\n\r", c);
 			if(c == 'w' && ext_throttle < 0.25){
 				ext_throttle = 0.25;
+				flight_controller.set_base_thrust(ext_throttle);
 				pc.printf("Throttle start to: '%f' percent.\n\r", ext_throttle);
 			}else if(c == 'w' && ext_throttle <= 0.9){
 				ext_throttle = ext_throttle + 0.05;
+				flight_controller.set_base_thrust(ext_throttle);
 				pc.printf("Throttle set to: '%f' percent.\n\r", ext_throttle);
 			}
 			else if(c == 's' && ext_throttle >= 0.3){
 				ext_throttle = ext_throttle - 0.05;
+				flight_controller.set_base_thrust(ext_throttle);
 				pc.printf("Throttle set to: '%f' percent.\n\r", ext_throttle);
 			}else if(c == 's' && ext_throttle >= 0.1){
 				ext_throttle = 0;
+				flight_controller.set_base_thrust(ext_throttle);
 				pc.printf("Throttle Off.\n\r");
 			}else if(c == 'x'){
 				ext_yaw = 0;
@@ -486,28 +533,36 @@ void run_remote_control_thread(void const *args){
 				ext_roll = 0;
 				pc.printf("Yaw pitch roll reset\n\r", ext_throttle);
 			}else if(c == 'f'){
-				//ext_rp -= 0.1;
-				//pc.printf("Roll P is now: %f\n\r", ext_rp);
-				ext_yaw = -1;
-				pc.printf("Yaw left.\n\r");
+				ext_rp -= 0.001;
+				flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
+				flight_controller.update_pitch_rate_pids(ext_rp, -1, -1);
+				pc.printf("PitcHRate/RollRate P is now: %f\n\r", ext_rp);
+				//ext_yaw = -1;
+				//pc.printf("Yaw left.\n\r");
 			}
 			else if(c == 'h'){
-				//ext_rp += 0.1;
-				//pc.printf("Roll P is now: %f\n\r", ext_rp);
-				ext_yaw = 1;
-				pc.printf("Yaw right.\n\r");
+				ext_rp += 0.001;
+				flight_controller.update_pitch_rate_pids(ext_rp, -1, -1);
+				flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
+				pc.printf("PitchRate/RollRate P is now: %f\n\r", ext_rp);
+				//ext_yaw = 1;
+				//pc.printf("Yaw right.\n\r");
 			}
 			else if(c == 't'){
-				//ext_pp += 0.1;
-				//pc.printf("Pitch P is now: %f\n\r", ext_pp);
-				ext_pitch = 1;
-				pc.printf("Pitch forward.\n\r");
+				ext_pp += 0.005;
+				flight_controller.update_pitch_pids(ext_pp, -1, -1);
+				flight_controller.update_roll_pids(ext_pp, -1, -1);
+				pc.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
+				//ext_pitch = 1;
+				//c.printf("Pitch forward.\n\r");
 			}
 			else if(c == 'g'){
-				//ext_pp -= 0.1;
-				//pc.printf("Pitch P is now: %f\n\r", ext_pp);
-				ext_pitch = -1;
-				pc.printf("Pitch backward.\n\r");
+				ext_pp -= 0.005;
+				flight_controller.update_pitch_pids(ext_pp, -1, -1);
+				flight_controller.update_roll_pids(ext_pp, -1, -1);
+				pc.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
+				//ext_pitch = -1;
+				//pc.printf("Pitch backward.\n\r");
 			}
 			else if(c == 'a'){
 				ext_roll = 1;
@@ -634,14 +689,22 @@ void run_flight_logger_thread(void const *args){
 				fprintf(log_fp, log_buffer);
 				fclose(log_fp);
 			}
-			Thread::wait(50); //(reduce to <10Hz later)
+			Thread::wait(50); //(reduce to <10Hz later)(usually 50)
 
 		}
 	}
 }
 
+
 void run_remote_logger_thread(void const *args){
 
+	/*craft_orientation_des_t orient_des = {0,0,0};
+
+	RtosTimer test_timer(test_periodic, osTimerPeriodic, &orient_des);
+		//RtosTimer print_timer(print_sensor_data, osTimerPeriodic, (void *)1);
+
+	test_timer.start(1000);
+*/
 	while(true){Thread::wait(osWaitForever);}
 }
 
