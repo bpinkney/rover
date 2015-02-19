@@ -5,11 +5,11 @@ flight_controller_t::flight_controller_t(){
 }
 
 void flight_controller_t::init(){
-	pitch_p = 0.00;
+	pitch_p = 0.0;
 	pitch_i = 0.0;
 	pitch_d = 0;
 
-	roll_p = 0.00;
+	roll_p = 0.0;
 	roll_i = 0.0;
 	roll_d = 0;
 
@@ -17,13 +17,13 @@ void flight_controller_t::init(){
 	yaw_i = 0;
 	yaw_d = 0;
 
-	pitch_rate_p = 0.0;
+	pitch_rate_p = 0;//0.015;//0.055
 	pitch_rate_i = 0;
-	pitch_rate_d = 0;
+	pitch_rate_d = 0.0;//0.003
 
-	roll_rate_p = 0.0;
+	roll_rate_p = 0;//0.015;//0.04
 	roll_rate_i = 0;
-	roll_rate_d = 0;
+	roll_rate_d = 0.0;//0.003
 
 	yaw_rate_p = 0;
 	yaw_rate_i = 0;
@@ -54,8 +54,8 @@ void flight_controller_t::init(){
 	egd = {0,0,0};
 
 	timestamp = 0; //used when dt is not constant
-	dt_outer = 100;
-	dt_inner = 10;
+	dt_outer = 0.04;
+	dt_inner = 0.01;
 	base_thrust = 0;
 
 	outer_loop_activate_count = 0;
@@ -171,6 +171,7 @@ void flight_controller_t::run_outer_control_loop(){
 	roll_err_previous = roll_err;
 	yaw_err_previous = yaw_err;
 
+
 }
 
 void flight_controller_t::run_inner_control_loop(){
@@ -183,9 +184,12 @@ void flight_controller_t::run_inner_control_loop(){
 	get_ext_gyro_data(&egd, sizeof(egd));
 
 	//determine rate errors
-	pitch_rate_err = egd.x - pitch_rate_delta; // m/s // x gyro = -x craft
+	pitch_rate_err = -egd.x + pitch_rate_delta; // m/s // x gyro = -x craft
 	roll_rate_err = -egd.y - roll_rate_delta; // m/s (negative due to stuff and such)
-	yaw_rate_err = egd.z - yaw_rate_delta; //verification required // z gyro = -z craft
+	yaw_rate_err = -egd.z + yaw_rate_delta; //verification required // z gyro = -z craft
+
+
+	//pc.printf("Desired Angular Rate Change [RP] [%f, %f]     Gyro Rates [YXZ] [%f, %f, %f]\n\r", roll_rate_delta, pitch_rate_delta, egd.y, egd.x, egd.z);
 
 	//for 'I' term
 	pitch_rate_err_integral = min(max(pitch_rate_err_integral + pitch_rate_err*dt_inner, -integral_rate_limit), integral_rate_limit);
@@ -209,10 +213,10 @@ void flight_controller_t::run_inner_control_loop(){
 		yaw_rate_i*yaw_rate_err_integral;
 
 	set_motor_thrust_des({
-		base_thrust + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta,//FL
-		base_thrust + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta,//FR
-		base_thrust - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta,//RR
-		base_thrust - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta//RL
+		base_thrust*(1 + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta),//FL
+		base_thrust*(1 + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta),//FR
+		base_thrust*(1 - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta),//RR
+		base_thrust*(1 - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta)//RL
 	});
 
 	//for i+1 'D' term
@@ -221,7 +225,7 @@ void flight_controller_t::run_inner_control_loop(){
 	yaw_rate_err_previous = yaw_rate_err;
 
 	//increment outer loop flag
-	if(outer_loop_activate_count > 8){//every 1/10 inner loops run the outer loop
+	if(outer_loop_activate_count > 2){//every 1/4 inner loops run the outer loop
 		outer_loop_activate_count = 0;
 	}else{
 		outer_loop_activate_count++;

@@ -46,7 +46,7 @@ flight_controller_t flight_controller;
 const uint16_t imu_read_period = 10;
 const uint16_t estimator_period = 10;
 const uint16_t flight_control_inner_period = 10;
-const uint16_t flight_control_outer_period = 100;
+//const uint16_t flight_control_outer_period = 20;
 uint32_t sw_uptime = 0;
 
 uint8_t status = 0;
@@ -273,7 +273,7 @@ void run_estimator_thread(void const *args){
 
 void run_motor_control_thread(void const *args){
 
-	pc.printf("MOTORS: initilaize ESCs\n\r");
+	pc.printf("MOTORS: initialize ESCs\n\r");
 
 	uint8_t calibrate_motor_range = 1;
 	ESC m1(PTA1);//FL
@@ -293,7 +293,7 @@ void run_motor_control_thread(void const *args){
 
 	motor_thrust_des_t des_motor_thrust = {0,0,0,0};
 
-	pc.printf("ESC intialized\n\r");
+	pc.printf("ESC initialized\n\r");
 	//pc.printf("set init throttle to : %f\n\r", throttle_var);
 	float init_time = 0;
 
@@ -312,12 +312,6 @@ void run_motor_control_thread(void const *args){
 			m4_throttle = 0;
 			//pc.printf("set throttle to : %f\n\r", throttle_var);
 		}else{
-
-			//these are all correct relative to the controller
-			/*m1_throttle = ext_throttle - 0.05*ext_yaw + 0.02*ext_pitch - 0.02*ext_roll;	//FL
-			m2_throttle = ext_throttle + 0.05*ext_yaw + 0.02*ext_pitch + 0.02*ext_roll; //FR
-			m3_throttle = ext_throttle - 0.05*ext_yaw - 0.02*ext_pitch + 0.02*ext_roll; //RR
-			m4_throttle = ext_throttle + 0.05*ext_yaw - 0.02*ext_pitch - 0.02*ext_roll; //RL*/
 
 			get_motor_thrust_des(&des_motor_thrust, sizeof(des_motor_thrust));
 			if(ext_throttle>0){
@@ -533,7 +527,7 @@ void run_remote_control_thread(void const *args){
 				ext_roll = 0;
 				pc.printf("Yaw pitch roll reset\n\r", ext_throttle);
 			}else if(c == 'f'){
-				ext_rp -= 0.001;
+				ext_rp -= 0.005;
 				flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
 				flight_controller.update_pitch_rate_pids(ext_rp, -1, -1);
 				pc.printf("PitcHRate/RollRate P is now: %f\n\r", ext_rp);
@@ -541,7 +535,7 @@ void run_remote_control_thread(void const *args){
 				//pc.printf("Yaw left.\n\r");
 			}
 			else if(c == 'h'){
-				ext_rp += 0.001;
+				ext_rp += 0.005;
 				flight_controller.update_pitch_rate_pids(ext_rp, -1, -1);
 				flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
 				pc.printf("PitchRate/RollRate P is now: %f\n\r", ext_rp);
@@ -549,7 +543,7 @@ void run_remote_control_thread(void const *args){
 				//pc.printf("Yaw right.\n\r");
 			}
 			else if(c == 't'){
-				ext_pp += 0.005;
+				ext_pp += 0.2;
 				flight_controller.update_pitch_pids(ext_pp, -1, -1);
 				flight_controller.update_roll_pids(ext_pp, -1, -1);
 				pc.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
@@ -557,7 +551,7 @@ void run_remote_control_thread(void const *args){
 				//c.printf("Pitch forward.\n\r");
 			}
 			else if(c == 'g'){
-				ext_pp -= 0.005;
+				ext_pp -= 0.2;
 				flight_controller.update_pitch_pids(ext_pp, -1, -1);
 				flight_controller.update_roll_pids(ext_pp, -1, -1);
 				pc.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
