@@ -5,27 +5,27 @@ flight_controller_t::flight_controller_t(){
 }
 
 void flight_controller_t::init(){
-	pitch_p = 0.0;
-	pitch_i = 0.0;
-	pitch_d = 0;
+	pitch_p = 0.45;//35 normally
+	pitch_i =  0.01;
+	pitch_d =  0.003;
 
-	roll_p = 0.0;
-	roll_i = 0.0;
-	roll_d = 0;
+	roll_p = 0.35;
+	roll_i =  0.01;
+	roll_d =  0.002;
 
-	yaw_p = 0;
-	yaw_i = 0;
+	yaw_p = 0.9;
+	yaw_i = 0.00;
 	yaw_d = 0;
 
-	pitch_rate_p = 0;//0.015;//0.055
-	pitch_rate_i = 0;
-	pitch_rate_d = 0.0;//0.003
+	pitch_rate_p = 0.04;
+	pitch_rate_i = 0.003;
+	pitch_rate_d = 0;
 
-	roll_rate_p = 0;//0.015;//0.04
-	roll_rate_i = 0;
-	roll_rate_d = 0.0;//0.003
+	roll_rate_p = 0.025;
+	roll_rate_i = 0.001;
+	roll_rate_d = 0.0;
 
-	yaw_rate_p = 0;
+	yaw_rate_p = 0.025;
 	yaw_rate_i = 0;
 	yaw_rate_d = 0;
 
@@ -45,8 +45,8 @@ void flight_controller_t::init(){
 	roll_rate_err_integral = 0;
 	yaw_rate_err_integral = 0;
 
-	integral_limit = 0.05; // m/s angular rate
-	integral_rate_limit = 0.05; //thurst /1
+	integral_limit = 0.5; // m/s angular rate
+	integral_rate_limit = 0.5; //thrust /1
 
 	orient_des = {0,0,0};
 	orient_est = {0,0,0};
@@ -127,6 +127,9 @@ void flight_controller_t::update_yaw_rate_pids(float p, float i, float d){
 		yaw_rate_d = d;
 	}
 }
+void flight_controller_t::set_test_vars(float a, float b, float c){
+	set_craft_orientation_des({b,a,c});//rpy
+}
 
 void flight_controller_t::set_base_thrust(float thrust){
 	base_thrust = thrust;
@@ -151,26 +154,27 @@ void flight_controller_t::run_outer_control_loop(){
 	yaw_err_integral = min(max(yaw_err_integral + yaw_err*dt_outer, -integral_limit), integral_limit);
 
 	//PIDs
-	pitch_rate_delta =
+	pitch_rate_des =
 		pitch_p*pitch_err +
 		pitch_d*(pitch_err - pitch_err_previous)/dt_outer +
 		pitch_i*pitch_err_integral;
 
-	roll_rate_delta =
+	roll_rate_des =
 		roll_p*roll_err +
 		roll_d*(roll_err - roll_err_previous)/dt_outer +
 		roll_i*roll_err_integral;
 
-	yaw_rate_delta =
+	yaw_rate_des =
 		yaw_p*yaw_err +
 		yaw_d*(yaw_err - yaw_err_previous)/dt_outer +
 		yaw_i*yaw_err_integral;
+
+	set_craft_rates_des({roll_rate_des, pitch_rate_des, yaw_rate_des});
 
 	//for i+1 'D' term
 	pitch_err_previous = pitch_err;
 	roll_err_previous = roll_err;
 	yaw_err_previous = yaw_err;
-
 
 }
 
@@ -184,12 +188,16 @@ void flight_controller_t::run_inner_control_loop(){
 	get_ext_gyro_data(&egd, sizeof(egd));
 
 	//determine rate errors
-	pitch_rate_err = -egd.x + pitch_rate_delta; // m/s // x gyro = -x craft
-	roll_rate_err = -egd.y - roll_rate_delta; // m/s (negative due to stuff and such)
-	yaw_rate_err = -egd.z + yaw_rate_delta; //verification required // z gyro = -z craft
+	pitch_rate_err = pitch_rate_des - egd.x; // m/s // orientation diffs between accels(craft orient) and gyros are accounted for in sensor read
+	roll_rate_err = roll_rate_des - egd.y; // m/s
+	yaw_rate_err = yaw_rate_des - egd.z; //verification required // z gyro = -z craft
 
+	//feb.27
+	//pitch_rate_err = -egd.x + pitch_rate_des; // m/s // x gyro = -x craft
+	//	roll_rate_err = -egd.y - roll_rate_des; // m/s (negative due to stuff and such)
+	//	yaw_rate_err = -egd.z + yaw_rate_des; //verification required // z gyro = -z craft
 
-	//pc.printf("Desired Angular Rate Change [RP] [%f, %f]     Gyro Rates [YXZ] [%f, %f, %f]\n\r", roll_rate_delta, pitch_rate_delta, egd.y, egd.x, egd.z);
+	//pc.printf("Desired Angular Rate Change [RP] [%f, %f]     Gyro Rates [YXZ] [%f, %f, %f]\n\r", roll_rate_des, pitch_rate_des, egd.y, egd.x, egd.z);
 
 	//for 'I' term
 	pitch_rate_err_integral = min(max(pitch_rate_err_integral + pitch_rate_err*dt_inner, -integral_rate_limit), integral_rate_limit);
@@ -212,11 +220,19 @@ void flight_controller_t::run_inner_control_loop(){
 		yaw_rate_d*(yaw_rate_err - yaw_rate_err_previous)/dt_inner +
 		yaw_rate_i*yaw_rate_err_integral;
 
+	//feb27
+	/*set_motor_thrust_des({
+			base_thrust*(1 + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta),//FL
+			base_thrust*(1 + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta),//FR
+			base_thrust*(1 - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta),//RR
+			base_thrust*(1 - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta)//RL
+		});*/
+
 	set_motor_thrust_des({
-		base_thrust*(1 + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta),//FL
-		base_thrust*(1 + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta),//FR
-		base_thrust*(1 - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta),//RR
-		base_thrust*(1 - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta)//RL
+		base_thrust + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta,//FL
+		base_thrust + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta,//FR
+		base_thrust - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta,//RR
+		base_thrust - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta//RL
 	});
 
 	//for i+1 'D' term

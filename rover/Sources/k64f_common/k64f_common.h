@@ -23,7 +23,10 @@
 #define K64F_COMMON_H_
 
 //usb serial out (9600 baud)
-extern Serial pc;
+//extern Serial pc;
+
+//radio
+extern Serial rs;
 
 //internal i2c bus for acc and mag
 extern FXOS8700Q_acc k64f_acc; // Proper Ports and I2C Address for K64F Freedom board
@@ -70,6 +73,9 @@ void set_craft_orientation_est(craft_orientation_est_t value);
 
 void get_craft_orientation_des(void* buffer, int size);
 void set_craft_orientation_des(craft_orientation_des_t value);
+
+void get_craft_rates_des(void* buffer, int size);
+void set_craft_rates_des(craft_rates_des_t value);
 
 void get_motor_thrust_des(void* buffer, int size);
 void set_motor_thrust_des(motor_thrust_des_t value);

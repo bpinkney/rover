@@ -59,7 +59,7 @@ private:
 
 	float pitch_err, roll_err, yaw_err;
 	float pitch_rate_err, roll_rate_err, yaw_rate_err;
-	float pitch_rate_delta, roll_rate_delta, yaw_rate_delta;
+	float pitch_rate_des, roll_rate_des, yaw_rate_des;
 	float pitch_thrust_delta, roll_thrust_delta, yaw_thrust_delta;
 
 	uint32_t timestamp;
@@ -82,6 +82,8 @@ public:
 	void update_pitch_rate_pids(float p, float i, float d);
 	void update_yaw_rate_pids(float p, float i, float d);
 	void set_base_thrust(float thrust);
+
+	void set_test_vars(float a, float b, float c);
 
 	void run_outer_control_loop(); //orientation to rate
 	void run_inner_control_loop(); //rate to thrusts

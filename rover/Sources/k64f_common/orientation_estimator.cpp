@@ -16,6 +16,7 @@ void orientation_estimator_t::init(){
 
 void orientation_estimator_t::run_estimate_loop(){
 
+	//pc.printf("gogog");
 	/*
 		 * gyro_est(i, 1) = (gyro_x(i, 1))*time_d(i)/1000;
 	  gyro_est(i, 2) = (gyro_y(i, 1))*time_d(i)/1000;
@@ -46,6 +47,8 @@ void orientation_estimator_t::run_estimate_loop(){
 	get_k64f_acc_data(&iad, sizeof(iad));
 	get_k64f_mag_data(&imd, sizeof(imd));
 	get_craft_orientation_est(&o_orient, sizeof(o_orient));
+
+	//pc.printf("Gyro Data [XYZ] [%f, %f, %f]\n\r", egd.x, egd.y, egd.z);
 
 	roll = gyro_trust*(o_orient.roll + (egd.x*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.x,sqrt(pow(iad.y,2) + pow(iad.z,2)));
 	pitch = gyro_trust*(o_orient.pitch + (egd.y*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.y,sqrt(pow(iad.x,2) + pow(iad.z,2)));

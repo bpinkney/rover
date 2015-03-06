@@ -70,6 +70,10 @@ class IMU
       int16_t L3GD20_biasX;  /* digit counts */
       int16_t L3GD20_biasY;
       int16_t L3GD20_biasZ;
+      float last_gyro_x;
+      float last_gyro_y;
+      float last_gyro_z;
+
       double  g_0;
       double  FF[3];
       double  FD[6][9]; 

@@ -1,8 +1,10 @@
 #include "k64f_common.h"
 
 //usb serial out (9600 baud)
-Serial pc(USBTX, USBRX);
+//Serial pc(USBTX, USBRX);
 
+//telemetry and general logging
+Serial rs(PTC17, PTC16); // tx, rx (baud rate set in thread)
 
 //internal i2c bus for acc and mag
 FXOS8700Q_acc k64f_acc(PTE25, PTE24, FXOS8700CQ_SLAVE_ADDR1); // Proper Ports and I2C Address for K64F Freedom board
@@ -14,8 +16,6 @@ FXOS8700Q_mag k64f_mag(PTE25, PTE24, FXOS8700CQ_SLAVE_ADDR1); // Proper Ports an
 //external (adafruit) accel and mag, gyro, baro and temp
 //IMU ext_imu(PTE25,PTE24);
 
-
-
 //data struct mutexes (why not have a crapload? a hit of RAM now for free threads later)
 Mutex k64f_acc_mutex;
 Mutex k64f_mag_mutex;
@@ -24,6 +24,7 @@ Mutex ext_acc_mutex;
 Mutex ext_mag_mutex;
 Mutex orient_est_mutex;
 Mutex orient_des_mutex;
+Mutex rates_des_mutex;
 Mutex motor_thrust_des_mutex;
 
 //data struct global iterations
@@ -35,6 +36,7 @@ ext_acc_data_t ext_acc_data = {0,0,0};
 ext_mag_data_t ext_mag_data = {0,0,0};
 craft_orientation_est_t craft_orientation_est = {0,0,0};
 craft_orientation_des_t craft_orientation_des = {0,0,0};
+craft_rates_des_t craft_rates_des = {0,0,0};
 motor_thrust_des_t motor_thrust_des = {0,0,0,0};
 
 //data struct getters and setters
@@ -132,6 +134,17 @@ void set_craft_orientation_des(craft_orientation_des_t value){
 	orient_des_mutex.lock();
 	craft_orientation_des = value;
 	orient_des_mutex.unlock();
+}
+
+void get_craft_rates_des(void* buffer, int size){
+	rates_des_mutex.lock();
+    memcpy(buffer, &craft_rates_des, size);
+    rates_des_mutex.unlock();
+}
+void set_craft_rates_des(craft_rates_des_t value){
+	rates_des_mutex.lock();
+	craft_rates_des = value;
+	rates_des_mutex.unlock();
 }
 
 void get_motor_thrust_des(void* buffer, int size){

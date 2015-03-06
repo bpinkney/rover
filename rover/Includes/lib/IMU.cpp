@@ -21,10 +21,17 @@ char IMU::init(void)  /* returns error upon a non-zero return */
 // CTRL_REG4: left at default = 0x00 --> Full Scale = 250 degrees/second --> Sensitivity = 0.00875 dps/digit.
     address = L3GD20_ADDR;
     tx[0] = L3GD20_CTRL_REG1; // address contrl_register 1
-    tx[1] = 0x1F; // 00-01-1-111 enable sensor and set operational mode. 
+    tx[1] = 0x5F; // 01-01-1-111 enable sensor and set operational mode.
     ack = _i2c.write(address, tx, 2);
     ack |= _i2c.write(address, tx, 1);
-    ack |= _i2c.read(address+1, &rx, 1); if (rx != 0x1F) ack |= 1;
+    ack |= _i2c.read(address+1, &rx, 1); if (rx != 0x5F) ack |= 1;
+
+    address = L3GD20_ADDR;
+	tx[0] = L3GD20_CTRL_REG4; // address contrl_register 4
+	tx[1] = 0x10; // 00-01-0-000 set Full Scale = 500 deg/s for testing.
+	ack = _i2c.write(address, tx, 2);
+	ack |= _i2c.write(address, tx, 1);
+	ack |= _i2c.read(address+1, &rx, 1); if (rx != 0x10) ack |= 1;
 //
 // 1.b Enable LSM303 accelerometer and set operational mode:
 // CTRL_REG1: set to 0x37 = 0011 1111 --> DR =  25Hz & enable sensor in low power mode (normal mode zmienic ostatnie 4 na 0111)
@@ -108,7 +115,7 @@ char IMU::readGyros(){
 	char ack, reg, D[6];
 	int16_t W[3];
 	float x, y, z;
-	ext_gyro_data_t oegd = {0,0,0};
+	//ext_gyro_data_t oegd = {0,0,0};
 	//int16_t temp;
 
 	// report the data in rad/s
@@ -123,18 +130,20 @@ char IMU::readGyros(){
 
 	//get_ext_gyro_temp(&temp, sizeof(temp));
 
-	x = -((float)W[0]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS - 0.01);// - (float)(0.002171*((float)temp) - 0.044515);//(float) 0.971*(W[0]-L3GD20_biasX)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
-	y = ((float)W[1]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS - 0.009710);// - (float)(-0.000237791*((float)temp) + 0.006740119);//(float) 0.998*(W[1]-L3GD20_biasY)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
-	z = -((float)W[2]*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS + 0.008);// - (float)(-0.001434761*((float)temp) + 0.032907619);//(float) 1.002*(W[2]-L3GD20_biasZ)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	x = -((float)W[0]*L3GD20_SENSITIVITY_500DPS*L3GD20_DPS_TO_RADS);// - (float)(0.002171*((float)temp) - 0.044515);//(float) 0.971*(W[0]-L3GD20_biasX)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	y = ((float)W[1]*L3GD20_SENSITIVITY_500DPS*L3GD20_DPS_TO_RADS - 0.009710);// - (float)(-0.000237791*((float)temp) + 0.006740119);//(float) 0.998*(W[1]-L3GD20_biasY)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
+	z = -((float)W[2]*L3GD20_SENSITIVITY_500DPS*L3GD20_DPS_TO_RADS);// - (float)(-0.001434761*((float)temp) + 0.032907619);//(float) 1.002*(W[2]-L3GD20_biasZ)*L3GD20_SENSITIVITY_250DPS*L3GD20_DPS_TO_RADS;
 
-	get_ext_gyro_data(&oegd, sizeof(oegd));
-
+	//get_ext_gyro_data(&oegd, sizeof(oegd));
+	//last_gyro_x = x;
+	//last_gyro_y = y;
+	//last_gyro_z = z;
 	//filter (iir lowpass, N = 10) //replace later
-	LP_FILT(oegd.x, x, 10);
-	LP_FILT(oegd.y, y, 10);
-	LP_FILT(oegd.z, z, 10);
+	LP_FILT(last_gyro_x, x, 4);
+	LP_FILT(last_gyro_y, y, 4);
+	LP_FILT(last_gyro_z, z, 4);
 
-	set_ext_gyro_data({oegd.x, oegd.y, oegd.z});
+	set_ext_gyro_data({last_gyro_x, last_gyro_y, last_gyro_z});
 
 	return ack;
 }

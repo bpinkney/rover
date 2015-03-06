@@ -57,6 +57,13 @@ struct craft_orientation_des_t{//__attribute__ ((__packed__)) {
     float yaw;
 };
 
+//desired rates (output of outer-loop, input to inner loop) in radians/s
+struct craft_rates_des_t{//__attribute__ ((__packed__)) {
+    float roll;//y
+    float pitch;//x
+    float yaw;
+};
+
 //desired motor thrusts, range[0:1] (0 - 100% thrust) ~ thrust * 10000 RPM w/turnigy 935s and 3S battery
 struct motor_thrust_des_t{//__attribute__ ((__packed__)) {
     float fl;//
