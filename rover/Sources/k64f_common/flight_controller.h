@@ -9,7 +9,7 @@ class flight_controller_t {
 
 private:
 	//flight_controller_t() {} (need if overloading public constructor)
-	float pitch_p;// if pitch_p = 6, a 0.5 radian offset will attempt to be corrected with a 3 rad/s movement speed
+	/*float pitch_p;// if pitch_p = 6, a 0.5 radian offset will attempt to be corrected with a 3 rad/s movement speed
 	float pitch_i;
 	float pitch_d;
 
@@ -56,6 +56,7 @@ private:
 	craft_orientation_est_t orient_est;
 	motor_thrust_des_t curr_motor_thrust;
 	ext_gyro_data_t egd;
+	ext_gyro_data_t last_egd;
 
 	float pitch_err, roll_err, yaw_err;
 	float pitch_rate_err, roll_rate_err, yaw_rate_err;
@@ -67,7 +68,46 @@ private:
 	float dt_outer;
 	float base_thrust;
 
-	uint8_t outer_loop_activate_count;
+	uint8_t outer_loop_activate_count;*/
+
+	//pddd new stuff
+	float pitch_p;
+	float roll_p;
+	float yaw_p;
+
+	float pitch_d;
+	float roll_d;
+	float yaw_d;
+
+	float pitch_dd;
+	float roll_dd;
+	float yaw_dd;
+
+	float pitch_pos_err, roll_pos_err, yaw_pos_err;
+	float pitch_vel_err, roll_vel_err, yaw_vel_err;
+	float pitch_acc_err, roll_acc_err, yaw_acc_err;
+	float pitch_thrust_delta, roll_thrust_delta, yaw_thrust_delta;
+
+	float dt;
+	float base_thrust;
+
+	//position
+	craft_orientation_des_t orient_des;
+	craft_orientation_des_t last_orient_des;
+	craft_orientation_est_t orient_est;
+	craft_orientation_est_t last_orient_est;
+
+	motor_thrust_des_t curr_motor_thrust;
+
+	//speed
+	craft_rates_t des_rates;
+	//craft_rates_t last_des_rates; (if using non-zero des_acc)
+	ext_gyro_data_t egd;
+	ext_gyro_data_t last_egd;
+
+	//acceleration
+	craft_accs_t des_ang_acc;
+	craft_accs_t est_ang_acc;
 
 	//private methods
 
@@ -75,18 +115,23 @@ private:
 public:
 	flight_controller_t();
 	void init();
-	void update_roll_pids(float p, float i, float d);
+	void update_pitch_pddd(float p, float d, float dd);
+	void update_roll_pddd(float p, float d, float dd);
+	void update_yaw_pddd(float p, float d, float dd);
+	/*void update_roll_pids(float p, float i, float d);
 	void update_pitch_pids(float p, float i, float d);
 	void update_yaw_pids(float p, float i, float d);
 	void update_roll_rate_pids(float p, float i, float d);
 	void update_pitch_rate_pids(float p, float i, float d);
-	void update_yaw_rate_pids(float p, float i, float d);
+	void update_yaw_rate_pids(float p, float i, float d);*/
 	void set_base_thrust(float thrust);
 
 	void set_test_vars(float a, float b, float c);
 
-	void run_outer_control_loop(); //orientation to rate
-	void run_inner_control_loop(); //rate to thrusts
+	void run_control_loop(); //p-d-dd loop for rate and angle combined
+
+	/*void run_outer_control_loop(); //orientation to rate
+	void run_inner_control_loop(); //rate to thrusts*/
 
 
 

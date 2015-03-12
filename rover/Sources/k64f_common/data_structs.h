@@ -50,15 +50,22 @@ struct craft_orientation_est_t{//__attribute__ ((__packed__)) {
     float yaw;
 };
 
-//desired orientation in radians
+//desired ang orientation in radians
 struct craft_orientation_des_t{//__attribute__ ((__packed__)) {
     float roll;//y
     float pitch;//x
     float yaw;
 };
 
-//desired rates (output of outer-loop, input to inner loop) in radians/s
-struct craft_rates_des_t{//__attribute__ ((__packed__)) {
+//desired or est ang rates in radians/s
+struct craft_rates_t{//__attribute__ ((__packed__)) {
+    float roll;//y
+    float pitch;//x
+    float yaw;
+};
+
+//desired or est ang acceleration in radians/s^2
+struct craft_accs_t{//__attribute__ ((__packed__)) {
     float roll;//y
     float pitch;//x
     float yaw;

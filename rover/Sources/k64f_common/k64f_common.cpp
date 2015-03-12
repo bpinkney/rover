@@ -25,6 +25,7 @@ Mutex ext_mag_mutex;
 Mutex orient_est_mutex;
 Mutex orient_des_mutex;
 Mutex rates_des_mutex;
+Mutex accs_est_mutex;
 Mutex motor_thrust_des_mutex;
 
 //data struct global iterations
@@ -36,7 +37,8 @@ ext_acc_data_t ext_acc_data = {0,0,0};
 ext_mag_data_t ext_mag_data = {0,0,0};
 craft_orientation_est_t craft_orientation_est = {0,0,0};
 craft_orientation_des_t craft_orientation_des = {0,0,0};
-craft_rates_des_t craft_rates_des = {0,0,0};
+craft_rates_t craft_rates_des = {0,0,0};
+craft_accs_t craft_accs_est = {0,0,0};
 motor_thrust_des_t motor_thrust_des = {0,0,0,0};
 
 //data struct getters and setters
@@ -141,10 +143,21 @@ void get_craft_rates_des(void* buffer, int size){
     memcpy(buffer, &craft_rates_des, size);
     rates_des_mutex.unlock();
 }
-void set_craft_rates_des(craft_rates_des_t value){
+void set_craft_rates_des(craft_rates_t value){
 	rates_des_mutex.lock();
 	craft_rates_des = value;
 	rates_des_mutex.unlock();
+}
+
+void get_craft_accs_est(void* buffer, int size){
+	accs_est_mutex.lock();
+    memcpy(buffer, &craft_accs_est, size);
+    accs_est_mutex.unlock();
+}
+void set_craft_accs_est(craft_accs_t value){
+	accs_est_mutex.lock();
+	craft_accs_est = value;
+	accs_est_mutex.unlock();
 }
 
 void get_motor_thrust_des(void* buffer, int size){

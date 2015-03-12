@@ -367,7 +367,7 @@ void run_motor_control_thread(void const *args){
 }
 
 void flight_control_inner_loop(void const *n){
-	flight_controller.run_inner_control_loop();
+	flight_controller.run_control_loop();
 }
 
 void run_flight_control_thread(void const *args){
@@ -426,18 +426,21 @@ void run_remote_control_thread(void const *args){
 				ext_roll = 0;
 				rs.printf("Yaw pitch roll reset\n\r", ext_throttle);
 			}else if(c == 'f'){//(A) Y
-				ext_pp -= 0.0005;
+				ext_rp -= 0.001;
 				//flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
-				flight_controller.update_pitch_pids(-1, -1, ext_pp);
-				rs.printf("%d: PitcH D is now: %f\n\r",sw_uptime, ext_pp);
+				//flight_controller.update_pitch_rate_pids(-1,-1, ext_rp);
+				rs.printf("%d: Roll rate D is now: %f\n\r", sw_uptime,ext_rp);
+				flight_controller.update_roll_pddd(-1, ext_rp, -1);
 				//ext_yaw = -1;xx
 				//rs.printf("Yaw left.\n\r");
 			}
 			else if(c == 'h'){//A (Y)
-				ext_pp += 0.0005;
-				flight_controller.update_pitch_pids(-1, -1,ext_pp);
+
+				ext_rp += 0.001;
+				//flight_controller.update_pitch_rate_pids(-1,-1,ext_rp);
 				//flight_controller.update_roll_rate_pids(ext_pp, -1, -1);
-				rs.printf("%d: Pitch D is now: %f\n\r",sw_uptime, ext_pp);
+				rs.printf("%d: Roll rate D is now: %f\n\r", sw_uptime,ext_rp);
+				flight_controller.update_roll_pddd(-1, ext_rp, -1);
 				//ext_yaw = 1;
 				//rs.printf("Yaw right.\n\r");
 
@@ -459,24 +462,32 @@ void run_remote_control_thread(void const *args){
 				//rs.printf("Yaw right.\n\r");
 			}*/
 			else if(c == 't'){//X (B)
-				ext_rp += 15/57.2958;
-				flight_controller.set_test_vars(0, 0, ext_rp);//pitch,roll,yaw
-				rs.printf("%d: desired yaw angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
+				ext_pp += 0.01;
+				//ext_rp += 15/57.2958;
+				//flight_controller.set_test_vars(0, ext_rp, 0);//pitch,roll,yaw
+				//rs.printf("%d: desired roll angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
 				//flight_controller.update_pitch_rate_pids(-1, -1, ext_rp);
-				//flight_controller.update_roll_rate_pids(-1, -1, ext_rp, -1, -1);
-				//rs.printf("RollRate DDDDD is now: %f\n\r", ext_rp);
+				//flight_controller.update_roll_rate_pids(-1,-1,ext_pp);
+				rs.printf("%d: Roll rate P is now: %f\n\r", sw_uptime,ext_pp);
+				flight_controller.update_roll_pddd(ext_pp, -1, -1);
 				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
 				//flight_controller.update_roll_pids(ext_pp, -1, -1);
-				//rs.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
+				//rs.printf("%d: Pitch/Roll P is now: %f\n\r", sw_uptime, ext_pp);
 				//ext_pitch = 1;
 				//c.printf("Pitch forward.\n\r");
 			}
 			else if(c == 'g'){//(X) B
-				ext_rp -= 15/57.2958;
-				flight_controller.set_test_vars(0, 0, ext_rp);//pitch
+				ext_pp -= 0.01;
+				//ext_rp -= 15/57.2958;
+				//flight_controller.set_test_vars(0, ext_rp, 0);//pitch
 				//flight_controller.update_pitch_rate_pids(-1, -1, ext_rp);
-				//flight_controller.update_roll_rate_pids(-1, -1, ext_rp);
-				rs.printf("%d: desired yaw angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
+				//flight_controller.update_roll_rate_pids(-1,-1,ext_pp);
+				rs.printf("%d: Roll rate P is now: %f\n\r", sw_uptime,ext_pp);
+				flight_controller.update_roll_pddd(ext_pp, -1, -1);
+				//rs.printf("%d: desired roll angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
+				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
+				//flight_controller.update_roll_pids(ext_pp, -1, -1);
+				//rs.printf("%d: Pitch/Roll P is now: %f\n\r", sw_uptime, ext_pp);
 				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
 				//flight_controller.update_roll_pids(ext_pp, -1, -1);
 				//rs.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
@@ -533,7 +544,8 @@ void run_flight_logger_thread(void const *args){
 	k64f_mag_data_t imd = {0,0,0};
 	craft_orientation_est_t orient_est = {0,0,0};
 	craft_orientation_des_t orient_des = {0,0,0};
-	craft_rates_des_t rates_des = {0,0,0};
+	craft_rates_t rates_des = {0,0,0};
+	craft_accs_t accs_est = {0,0,0};
 	motor_thrust_des_t motor_thrust = {0,0,0,0};
 	Thread::wait(2000);
 	rs.printf("Flight Log Starting...\n\r");
@@ -560,12 +572,12 @@ void run_flight_logger_thread(void const *args){
 			date_stamp,
 			"Flight Log #", log_number,
 			"ROVER: 'Rover Observation Vehicle for Enclosed Regions'",
-			"Flight Log - Format Version '0.5'",
-			"LEGEND:[rover_t, rover_status, [rover_orient_est], [rover_orient_des], [rover_ex_gyro], rover_ex_gyro_temp, [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag], [rover_thrusts_des]");
+			"Flight Log - Format Version '0.6'",
+			"LEGEND:[rover_t, rover_status, [rover_orient_est], [rover_orient_des],[rover_rates_des],[rover_accs_est], [rover_ex_gyro], rover_ex_gyro_temp, [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag], [rover_thrusts_des]");
 
 	log_fp = fopen(filename, "w");
 	if (log_fp == NULL || sd_ready!=0) {
-		rs.printf("Unable to write flightlog header!! \n");
+		rs.printf("Unable to write flight log header!! \n");
 		fclose(log_fp);
 		set_status(33);
 		Thread::wait(osWaitForever);
@@ -581,7 +593,7 @@ void run_flight_logger_thread(void const *args){
 
 		while(true){
 			if (log_fp == NULL) {
-				rs.printf("Unable to write flightlog!! \n");
+				rs.printf("Unable to write flight log!! \n");
 			} else {
 				get_ext_mag_data(&emd, sizeof(emd));
 				get_ext_acc_data(&ead, sizeof(ead));
@@ -592,14 +604,16 @@ void run_flight_logger_thread(void const *args){
 				get_craft_orientation_est(&orient_est, sizeof(orient_est));
 				get_craft_orientation_des(&orient_des, sizeof(orient_des));
 				get_craft_rates_des(&rates_des, sizeof(rates_des));
+				get_craft_accs_est(&accs_est, sizeof(accs_est));
 				get_motor_thrust_des(&motor_thrust, sizeof(motor_thrust));
 
 				sprintf(log_buffer,
-						"DATA[%d, 0, [%f,%f,%f],[%f,%f,%f],[%f,%f,%f], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f],[%f,%f,%f,%f]]\n",
+						"DATA[%d, 0, [%f,%f,%f],[%f,%f,%f],[%f,%f,%f],[%f,%f,%f], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f],[%f,%f,%f,%f]]\n",
 						sw_uptime,
 						orient_est.roll, orient_est.pitch, orient_est.yaw,
 						orient_des.roll, orient_des.pitch, orient_des.yaw,
 						rates_des.roll, rates_des.pitch, rates_des.yaw,
+						accs_est.roll, accs_est.pitch, accs_est.yaw,
 						egd.x, egd.y, egd.z,
 						egt.temp_c,
 						ead.x, ead.y, ead.z,

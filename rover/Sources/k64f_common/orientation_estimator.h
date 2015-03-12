@@ -16,10 +16,15 @@ private:
 
 	float pitch, roll, yaw; //(x, y, z), check the flyer and imu axes if you need to verify
 
+	float dt; //make sure to change this period if the calling frequency changes (could probably link it up)
+
 	ext_gyro_data_t egd;
+	ext_gyro_data_t last_egd;
 	k64f_acc_data_t iad;
 	k64f_mag_data_t imd;
 	craft_orientation_est_t o_orient;
+	craft_accs_t acc_est;
+	craft_accs_t last_acc_est;
 
 	//private methods
 

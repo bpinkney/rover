@@ -33,9 +33,9 @@ int k64f_sensor_interface::fetch_sensor_data(){
 	float acc_z = (float)((float)acc_raw.z*FXOS8700Q_00_LSB*0.996061268 - 0.0543);
 
 	//low pass filter (IIR)
-	LP_FILT(oiad.x, acc_x, 10);
-	LP_FILT(oiad.y, acc_y, 10);
-	LP_FILT(oiad.z, acc_z, 10);
+	LP_FILT(oiad.x, acc_x, 15);
+	LP_FILT(oiad.y, acc_y, 15);
+	LP_FILT(oiad.z, acc_z, 15);
 
 	set_k64f_acc_data({
 		oiad.x,

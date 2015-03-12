@@ -1,7 +1,7 @@
 
 
 if(~exist('flight_log_data', 'var'))
-    parse_flightlog_05('rover_flight_logs\rev_5\pole_p_angle_test_7.txt');
+    parse_flightlog_06('rover_flight_logs\rev_6\pd_roll_spin_test_0.txt');
     global flight_log_data;
     flight_log_data.rover_t = flight_log_data.rover_t(1:max(size(flight_log_data.rover_ex_gyro)));
 end 
@@ -11,6 +11,8 @@ acc = 0;
 gyro = 0;
 est = 0;
 pids = 1;
+
+noise_check  = 0;
 
 
 %% mag cal
@@ -248,7 +250,7 @@ gyro_est = zeros(gyro_len-1, 2);
 acc_est = zeros(gyro_len-1, 2);
 overall_est = zeros(gyro_len-1, 2);
 
-gyro_trust = 0.0;
+gyro_trust = 0.10;
 acc_trust = 1-gyro_trust;
 
 for i = 2:gyro_len - 1
@@ -270,7 +272,8 @@ for i = 2:gyro_len - 1
   overall_est(i, :) = gyro_trust*(overall_est(i-1, :) + gyro_est(i, :)) + acc_est(i, :)*acc_trust;
   
 end
-
+figure;
+plot(flight_log_data.rover_t(1:end-1)/1000, overall_est);
 %check filters
 % figure; hold on
 % plot(flight_log_data.rover_t/1000, flight_log_data.rover_int_acc-5);
@@ -288,18 +291,37 @@ end
 % plot(flight_log_data.rover_t/1000, filter(b_acc,a_acc,flight_log_data.rover_int_acc)+2);
 % title('Buttered');
 
-figure; hold on;
-%plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(overall_est));
-plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 1)), 'b');
-plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 2)), 'g');
-legend('Roll Est', 'Pitch Est');
-title(sprintf('Pitch and Roll Estimates, On-Board'));
-ylabel('degrees');
-xlabel('seconds');
+% figure; hold on;
+% %plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(overall_est));
+% plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 1)), 'b');
+% plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_orient(:, 2)), 'g');
+% plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg( overall_est(:, 1)), 'c');
+% plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg( overall_est(:, 2)), 'm');
+% legend('Roll Est', 'Pitch Est', 'Calc Roll Est', 'Calc Pitch Est');
+% title(sprintf('Pitch and Roll Estimates, On-Board'));
+% ylabel('degrees');
+% xlabel('seconds');
 
-
-yaw_est = zeros(gyro_len-1, 1);
-yaw_est_uncorrected = zeros(gyro_len-1, 1);
+%ang acc est
+% three_dt = ones(max(size(flight_log_data.rover_t(1:end-1))), 3);
+% three_dt(:, 1) = three_dt(:, 1).*((flight_log_data.rover_t(2:end) - flight_log_data.rover_t(1:end-1))/1000);
+% three_dt(:, 2) = three_dt(:, 2).*((flight_log_data.rover_t(2:end) - flight_log_data.rover_t(1:end-1))/1000);
+% three_dt(:, 3) = three_dt(:, 3).*((flight_log_data.rover_t(2:end) - flight_log_data.rover_t(1:end-1))/1000);
+% ang_acc_est = (flight_log_data.rover_ex_gyro(2:end, :) - flight_log_data.rover_ex_gyro(1:end-1, :))./three_dt;
+% 
+% %[b,a] = butter(20,0.2);
+% %ang_acc_est = filter(b,a,ang_acc_est);
+% 
+% figure; hold on;
+% %plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(ang_acc_est(:, 1)), 'r');
+% %plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(ang_acc_est(:, 2)), 'm');
+% plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_accs_est(:, 2)), 'b');
+% plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_accs_est(:, 1)), 'g');
+% %legend('ang acc est calc X(pitch)', 'ang acc est calc Y(roll)', 
+% legend('ang acc est onboard X(pitch)', 'ang acc est onboard Y(roll)');
+% 
+% yaw_est = zeros(gyro_len-1, 1);
+% yaw_est_uncorrected = zeros(gyro_len-1, 1);
 
 for i = 2:gyro_len - 1   
 %corrected mag vector
@@ -414,7 +436,7 @@ end
 
 
 if(pids)
-    
+    figure;
     roll_err = flight_log_data.rover_orient_des(:, 1) - flight_log_data.rover_orient(:, 1);
     pitch_err = flight_log_data.rover_orient_des(:, 2) - flight_log_data.rover_orient(:, 2);
     yaw_err = flight_log_data.rover_orient_des(:, 3) - flight_log_data.rover_orient(:, 3);
@@ -518,32 +540,42 @@ if(pids)
 %     plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_rates_des(:, 1) - gyro_y)));
 %     plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_rates_des(:, 2) - gyro_x)), 'r');
 %     legend('abs Des Rate Roll - Gyro Rate Y(Roll)', 'abs Des Rate Pitch - Gyro Rate X(Pitch)');
-    plot(flight_log_data.rover_t/1000, flight_log_data.rover_m_thrust);
-    legend('FL Prop', 'FR Prop', 'RR Prop', 'RL Prop');
-    title('actual');
+    
+%plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(ang_acc_est(:, 1)), 'r');
+%plot(flight_log_data.rover_t(1:end-1)/1000, rad2deg(ang_acc_est(:, 2)), 'm');
+plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_accs_est(:, 2)), 'b');
+plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_accs_est(:, 1)), 'g');
+%legend('ang acc est calc X(pitch)', 'ang acc est calc Y(roll)', 
+legend('ang acc est onboard X(pitch)', 'ang acc est onboard Y(roll)');
+ylabel('m/s^2');
 
-    
-    %[b,a] = butter(20,0.15);
-    figure; hold on;
-    plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_orient_des(:, 1) - flight_log_data.rover_orient(:, 1))), 'b');
-    plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_orient_des(:, 2) - flight_log_data.rover_orient(:, 2))), 'r');
-    
-    legend('roll err abs', 'pitch err abs');
-    
-    figure; hold on;
-    plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(flight_log_data.rover_orient_des(:, 3))), 'r');
-    plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(flight_log_data.rover_orient(:, 3)-pi)), 'b');
-    legend('des yaw', 'yaw');
-    
-%     figure; hold on;
-%     plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(wrapToPi(flight_log_data.rover_orient_des(:, 3)-pi) - wrapToPi(flight_log_data.rover_orient(:, 3)-pi))), 'r');
+figure; hold on;
+plot(flight_log_data.rover_t/1000, flight_log_data.rover_m_thrust);
+    legend('FL Prop', 'FR Prop', 'RR Prop', 'RL Prop');
+%     title('actual');
+
 %     
-%     legend('yaw err');
-    
-     figure; hold on;
-    plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_rates_des(:, 3)), 'r');
-    plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_ex_gyro(:,3)), 'b');
-    legend('des yaw rate', 'yaw rate');
+%     %[b,a] = butter(20,0.15);
+%     figure; hold on;
+%     plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_orient_des(:, 1) - flight_log_data.rover_orient(:, 1))), 'b');
+%     plot(flight_log_data.rover_t/1000, rad2deg(abs(flight_log_data.rover_orient_des(:, 2) - flight_log_data.rover_orient(:, 2))), 'r');
+%     
+%     legend('roll err abs', 'pitch err abs');
+%     
+%     figure; hold on;
+%     plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(flight_log_data.rover_orient_des(:, 3))), 'r');
+%     plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(flight_log_data.rover_orient(:, 3)-pi)), 'b');
+%     legend('des yaw', 'yaw');
+%     
+% %     figure; hold on;
+% %     plot(flight_log_data.rover_t/1000, rad2deg(wrapToPi(wrapToPi(flight_log_data.rover_orient_des(:, 3)-pi) - wrapToPi(flight_log_data.rover_orient(:, 3)-pi))), 'r');
+% %     
+% %     legend('yaw err');
+%     
+%      figure; hold on;
+%     plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_rates_des(:, 3)), 'r');
+%     plot(flight_log_data.rover_t/1000, rad2deg(flight_log_data.rover_ex_gyro(:,3)), 'b');
+%     legend('des yaw rate', 'yaw rate');
 % [b,a] = butter(20,0.2);
 % %figure;hold on;
 % 
@@ -565,7 +597,17 @@ if(pids)
 
 %legend();
 
- end
+end
+ 
+if noise_check
+   figure;
+   hold on;
+   plot(flight_log_data.rover_t/1000,rad2deg(flight_log_data.rover_orient(:,1)), 'b');
+   plot(flight_log_data.rover_t/1000,rad2deg(flight_log_data.rover_orient(:,2)), 'r');
+   
+   legend('Est X', 'Est Y');
+    
+end
 
 
 % mag_x = filter(b,a,flight_log_data.rover_int_mag(:, 1));

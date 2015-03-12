@@ -5,27 +5,27 @@ flight_controller_t::flight_controller_t(){
 }
 
 void flight_controller_t::init(){
-	pitch_p = 0.45;//35 normally
-	pitch_i =  0.01;
-	pitch_d =  0.003;
+	/*pitch_p = 3; //(x P term)
+	//pitch_i =  0;//0.01;
+	//pitch_d =  0;//0.003;
 
-	roll_p = 0.35;
-	roll_i =  0.01;
-	roll_d =  0.002;
+	roll_p = 3.7; //(x P term)
+	//roll_i =  0;//0.01;
+	//roll_d =  0;//0.002;
 
-	yaw_p = 0.9;
+	yaw_p = 0;//0.9;
 	yaw_i = 0.00;
 	yaw_d = 0;
 
-	pitch_rate_p = 0.04;
-	pitch_rate_i = 0.003;
-	pitch_rate_d = 0;
+	pitch_rate_p = 0.0425; //(x D term)
+	//pitch_rate_i = 0;//0.003;
+	pitch_rate_d = 0; //(x DD term) (shoulder be filtered output)
 
-	roll_rate_p = 0.025;
-	roll_rate_i = 0.001;
-	roll_rate_d = 0.0;
+	roll_rate_p = 0.0325; //(x D term)
+	//roll_rate_i = 0;//0.001;
+	roll_rate_d = 0.0; //(x DD term)
 
-	yaw_rate_p = 0.025;
+	yaw_rate_p = 0;//0.025;
 	yaw_rate_i = 0;
 	yaw_rate_d = 0;
 
@@ -58,10 +58,79 @@ void flight_controller_t::init(){
 	dt_inner = 0.01;
 	base_thrust = 0;
 
-	outer_loop_activate_count = 0;
+	outer_loop_activate_count = 0;*/
+
+	pitch_p = 0;
+	roll_p = 0;
+	yaw_p = 0;
+
+	pitch_d = 0;
+	roll_d = 0;
+	yaw_d = 0;
+
+	pitch_dd = 0;
+	roll_dd = 0;
+	yaw_dd = 0;
+
+	dt = 0.01;
+	base_thrust = 0;
+
+	//ang position
+	orient_des = {0,0,0};
+	orient_est = {0,0,0};
+	last_orient_des = {0,0,0};
+	last_orient_est = {0,0,0};
+
+	curr_motor_thrust = {0,0,0,0};
+
+	//ang speed
+	des_rates = {0,0,0};
+	egd = {0,0,0};
+	last_egd = {0,0,0};
+
+	//ang accel
+	des_ang_acc = {0,0,0}; //always zero for now
+	est_ang_acc = {0,0,0};
+
 }
 
-void flight_controller_t::update_roll_pids(float p, float i, float d){
+
+
+void flight_controller_t::update_pitch_pddd(float p, float d, float dd){
+	if(p != -1){
+		pitch_p = p;
+	}
+	if(d != -1){
+		pitch_d = d;
+	}
+	if(dd != -1){
+		pitch_dd = dd;
+	}
+}
+void flight_controller_t::update_roll_pddd(float p, float d, float dd){
+	if(p != -1){
+		roll_p = p;
+	}
+	if(d != -1){
+		roll_d = d;
+	}
+	if(dd != -1){
+		roll_dd = dd;
+	}
+}
+void flight_controller_t::update_yaw_pddd(float p, float d, float dd){
+	if(p != -1){
+		yaw_p = p;
+	}
+	if(d != -1){
+		yaw_d = d;
+	}
+	if(dd != -1){
+		yaw_dd = dd;
+	}
+}
+
+/*void flight_controller_t::update_roll_pids(float p, float i, float d){
 	if(p != -1){
 		roll_p = p;
 	}
@@ -126,16 +195,81 @@ void flight_controller_t::update_yaw_rate_pids(float p, float i, float d){
 	if(d != -1){
 		yaw_rate_d = d;
 	}
-}
+}*/
 void flight_controller_t::set_test_vars(float a, float b, float c){
-	set_craft_orientation_des({b,a,c});//rpy
+	//set_craft_orientation_des({b,a,c});//rpy
+
 }
 
 void flight_controller_t::set_base_thrust(float thrust){
 	base_thrust = thrust;
 }
 
-void flight_controller_t::run_outer_control_loop(){
+void flight_controller_t::run_control_loop(){
+
+	//get inputs [x_des, x'_des, x''_des]
+	get_craft_orientation_des(&orient_des, sizeof(orient_des));
+	get_craft_orientation_est(&orient_est, sizeof(orient_est));
+	//des vel derived locally in loop
+	get_craft_accs_est(&est_ang_acc, sizeof(est_ang_acc));
+	get_ext_gyro_data(&egd, sizeof(egd));
+
+	//temp
+	//pitch_vel_des = (orient_des - last_orient_des)/dt;
+
+	//pitch_acc_des = 0;
+	des_rates.pitch = (orient_des.pitch - last_orient_des.pitch)/dt; //(0 for holding hover position)
+	des_rates.roll = (orient_des.roll - last_orient_des.roll)/dt;
+	des_rates.yaw = (orient_des.yaw - last_orient_des.yaw)/dt;
+	//TODO write rates to mutex for printing
+
+
+	//control input errs (des - actual)
+	pitch_pos_err = orient_des.pitch - orient_est.pitch; //orientation err
+	roll_pos_err = orient_des.roll - orient_est.roll;
+	yaw_pos_err = orient_des.yaw - orient_est.yaw;
+	WRAP_2PI(yaw_pos_err);
+
+	pitch_vel_err = des_rates.pitch - egd.x; //vel err (des speed - measured gyro speed)
+	roll_vel_err = des_rates.roll - egd.y;
+	yaw_vel_err = des_rates.yaw - egd.z;
+
+	pitch_acc_err = des_ang_acc.pitch - est_ang_acc.pitch; //(0 - est_accs) acceleration error
+	roll_acc_err = des_ang_acc.roll - est_ang_acc.roll;
+	yaw_acc_err = des_ang_acc.yaw - est_ang_acc.yaw;
+
+	//p-d-dd controller application
+	pitch_thrust_delta =
+			pitch_p*pitch_pos_err +
+			pitch_d*pitch_vel_err +
+			pitch_dd*pitch_acc_err;
+
+	roll_thrust_delta =
+				roll_p*roll_pos_err +
+				roll_d*roll_vel_err +
+				roll_dd*roll_acc_err;
+
+	yaw_thrust_delta =
+				yaw_p*yaw_pos_err +
+				yaw_d*yaw_vel_err +
+				yaw_dd*yaw_acc_err;
+
+	set_motor_thrust_des({
+		base_thrust + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta,//FL
+		base_thrust + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta,//FR
+		base_thrust - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta,//RR
+		base_thrust - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta//RL
+	});
+
+
+	//set last values
+	last_orient_des = orient_des;
+	last_orient_est =  orient_est;
+	last_egd = egd;
+}
+
+
+/*void flight_controller_t::run_outer_control_loop(){
 
 	//get current desired and estimate orientations
 	get_craft_orientation_des(&orient_des, sizeof(orient_des));
@@ -221,12 +355,12 @@ void flight_controller_t::run_inner_control_loop(){
 		yaw_rate_i*yaw_rate_err_integral;
 
 	//feb27
-	/*set_motor_thrust_des({
+	set_motor_thrust_des({
 			base_thrust*(1 + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta),//FL
 			base_thrust*(1 + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta),//FR
 			base_thrust*(1 - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta),//RR
 			base_thrust*(1 - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta)//RL
-		});*/
+		});
 
 	set_motor_thrust_des({
 		base_thrust + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta,//FL
@@ -241,12 +375,12 @@ void flight_controller_t::run_inner_control_loop(){
 	yaw_rate_err_previous = yaw_rate_err;
 
 	//increment outer loop flag
-	if(outer_loop_activate_count > 2){//every 1/4 inner loops run the outer loop
+	if(outer_loop_activate_count >= 3){//every 1/8 inner loops run the outer loop
 		outer_loop_activate_count = 0;
 	}else{
 		outer_loop_activate_count++;
 	}
-}
+}*/
 
 
 

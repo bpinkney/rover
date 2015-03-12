@@ -5,13 +5,18 @@ orientation_estimator_t::orientation_estimator_t(){
 }
 
 void orientation_estimator_t::init(){
-	gyro_trust = 0.9;
+	gyro_trust = 0.95;
 	acc_trust = 1-gyro_trust;
 
 	egd = {0,0,0};
+	last_egd = {0,0,0};
 	iad = {0,0,0};
 	imd = {0,0,0};
-	o_orient = {0,0,0};
+	o_orient = {0,0,0};//last cycle's orient est
+	acc_est = {0,0,0};
+	last_acc_est = {0,0,0};
+
+	dt = 0.01; //10 ms
 }
 
 void orientation_estimator_t::run_estimate_loop(){
@@ -57,7 +62,21 @@ void orientation_estimator_t::run_estimate_loop(){
 
 	set_craft_orientation_est({roll, pitch, yaw}); //radians
 
+	//ang acc est
+	acc_est.pitch = (egd.x - last_egd.x)/dt;
+	acc_est.roll = (egd.y - last_egd.y)/dt;
+	acc_est.yaw = (egd.z - last_egd.z)/dt;
+	//may want to filter this acc value a bit (derivatives are noisy)
+	LP_FILT(last_acc_est.pitch, acc_est.pitch, 10); // at 100Hz this results in 10Hz filtering
+	LP_FILT(last_acc_est.roll, acc_est.roll, 10);
+	LP_FILT(last_acc_est.yaw, acc_est.yaw, 10);
 
+	set_craft_accs_est({last_acc_est.roll, last_acc_est.pitch, last_acc_est.yaw});
+
+	//set gyro vals for next cycle ang acc calc
+	last_egd = egd; //(needs to have explicitly since gyros are filtered in read/sensor stage )
+	//set acc est for filtering stage next cycle (done in filtering stage implicitly)
+	//last_acc_est = acc_est;
 }
 
 

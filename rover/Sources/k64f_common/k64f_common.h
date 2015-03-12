@@ -75,7 +75,10 @@ void get_craft_orientation_des(void* buffer, int size);
 void set_craft_orientation_des(craft_orientation_des_t value);
 
 void get_craft_rates_des(void* buffer, int size);
-void set_craft_rates_des(craft_rates_des_t value);
+void set_craft_rates_des(craft_rates_t value);
+
+void get_craft_accs_est(void* buffer, int size);//angular accs
+void set_craft_accs_est(craft_accs_t value);
 
 void get_motor_thrust_des(void* buffer, int size);
 void set_motor_thrust_des(motor_thrust_des_t value);

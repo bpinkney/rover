@@ -139,9 +139,9 @@ char IMU::readGyros(){
 	//last_gyro_y = y;
 	//last_gyro_z = z;
 	//filter (iir lowpass, N = 10) //replace later
-	LP_FILT(last_gyro_x, x, 4);
-	LP_FILT(last_gyro_y, y, 4);
-	LP_FILT(last_gyro_z, z, 4);
+	LP_FILT(last_gyro_x, x, 3);
+	LP_FILT(last_gyro_y, y, 3);
+	LP_FILT(last_gyro_z, z, 3);
 
 	set_ext_gyro_data({last_gyro_x, last_gyro_y, last_gyro_z});
 
