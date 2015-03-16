@@ -399,10 +399,23 @@ void run_remote_control_thread(void const *args){
 	//buttons: tfgh
 	//LR triggers: zx
 	//Select Start: kl
+
+	float pitch_p = 0.08;//0.18;
+	float pitch_d = 0.0095;//0.025;
+
+	float roll_p = 0.09;//0.13;
+	float roll_d = 0.0095;//0.027;
+
+	float pitch_dd = 0;
+	float roll_dd = 0;
+
+	float des_pitch;
+	float des_roll;
+
 	while(1) {
 		if(rs.readable()) {
 			c = rs.getc();
-			rs.printf("Radio chars received: '%d'\n\r", c);
+			//rs.printf("Radio chars received: '%d'\n\r", c);
 			if(c == 'w' && ext_throttle < 0.25){
 				ext_throttle = 0.25;
 				flight_controller.set_base_thrust(ext_throttle);
@@ -425,75 +438,75 @@ void run_remote_control_thread(void const *args){
 				ext_pitch = 0;
 				ext_roll = 0;
 				rs.printf("Yaw pitch roll reset\n\r", ext_throttle);
-			}else if(c == 'f'){//(A) Y
-				ext_rp -= 0.001;
-				//flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
-				//flight_controller.update_pitch_rate_pids(-1,-1, ext_rp);
-				rs.printf("%d: Roll rate D is now: %f\n\r", sw_uptime,ext_rp);
-				flight_controller.update_roll_pddd(-1, ext_rp, -1);
-				//ext_yaw = -1;xx
-				//rs.printf("Yaw left.\n\r");
-			}
-			else if(c == 'h'){//A (Y)
 
-				ext_rp += 0.001;
-				//flight_controller.update_pitch_rate_pids(-1,-1,ext_rp);
-				//flight_controller.update_roll_rate_pids(ext_pp, -1, -1);
-				rs.printf("%d: Roll rate D is now: %f\n\r", sw_uptime,ext_rp);
-				flight_controller.update_roll_pddd(-1, ext_rp, -1);
-				//ext_yaw = 1;
-				//rs.printf("Yaw right.\n\r");
+				//d
+			}else if(c == 'h'){//A (Y)
+				pitch_d += 0.0005;
+				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
+				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
 
 			}
-			/*else if(c == 't'){//X (B)
-				ext_rp += 0.001;
-				//flight_controller.update_roll_rate_pids(ext_rp, -1, -1);
-				flight_controller.update_pitch_rate_pids(-1,ext_rp,-1);//, -1, -1);
-				rs.printf("%d: PitcH I Rate is now: %f\n\r",sw_uptime, ext_rp);
-				//ext_yaw = -1;
-				//rs.printf("Yaw left.\n\r");
+			else if(c == 'f'){//(A) Y
+				pitch_d -= 0.0005;
+				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
+				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
 			}
-			else if(c == 'g'){//(X) B
-				ext_rp -= 0.001;
-				flight_controller.update_pitch_rate_pids(-1,ext_rp, -1);//, -1, -1);
-				//flight_controller.update_roll_rate_pids(ext_pp, -1, -1);
-				rs.printf("%d: Pitch I Rate is now: %f\n\r",sw_uptime, ext_rp);
-				//ext_yaw = 1;
-				//rs.printf("Yaw right.\n\r");
-			}*/
 			else if(c == 't'){//X (B)
-				ext_pp += 0.01;
-				//ext_rp += 15/57.2958;
-				//flight_controller.set_test_vars(0, ext_rp, 0);//pitch,roll,yaw
-				//rs.printf("%d: desired roll angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
-				//flight_controller.update_pitch_rate_pids(-1, -1, ext_rp);
-				//flight_controller.update_roll_rate_pids(-1,-1,ext_pp);
-				rs.printf("%d: Roll rate P is now: %f\n\r", sw_uptime,ext_pp);
-				flight_controller.update_roll_pddd(ext_pp, -1, -1);
-				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
-				//flight_controller.update_roll_pids(ext_pp, -1, -1);
-				//rs.printf("%d: Pitch/Roll P is now: %f\n\r", sw_uptime, ext_pp);
-				//ext_pitch = 1;
-				//c.printf("Pitch forward.\n\r");
+				roll_d += 0.0005;
+				flight_controller.update_roll_pddd(-1, roll_d,-1);
+				rs.printf("%d: roll D is now: %f\n\r", sw_uptime,roll_d);
 			}
 			else if(c == 'g'){//(X) B
-				ext_pp -= 0.01;
-				//ext_rp -= 15/57.2958;
-				//flight_controller.set_test_vars(0, ext_rp, 0);//pitch
-				//flight_controller.update_pitch_rate_pids(-1, -1, ext_rp);
-				//flight_controller.update_roll_rate_pids(-1,-1,ext_pp);
-				rs.printf("%d: Roll rate P is now: %f\n\r", sw_uptime,ext_pp);
-				flight_controller.update_roll_pddd(ext_pp, -1, -1);
-				//rs.printf("%d: desired roll angle is now: %f deg\n\r",sw_uptime, ext_rp*57.2958);
-				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
-				//flight_controller.update_roll_pids(ext_pp, -1, -1);
-				//rs.printf("%d: Pitch/Roll P is now: %f\n\r", sw_uptime, ext_pp);
-				//flight_controller.update_pitch_pids(ext_pp, -1, -1);
-				//flight_controller.update_roll_pids(ext_pp, -1, -1);
-				//rs.printf("Pitch/Roll P is now: %f\n\r", ext_pp);
-				//ext_pitch = -1;
-				//rs.printf("Pitch backward.\n\r");
+				roll_d -= 0.0005;
+				flight_controller.update_roll_pddd(-1, roll_d,-1);
+				rs.printf("%d: roll D is now: %f\n\r", sw_uptime,roll_d);
 			}
+
+				//p
+		/*}else if(c == 'h'){//A (Y)
+			pitch_p += 0.002;
+			flight_controller.update_pitch_pddd(pitch_p,-1, -1);
+			rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
+
+		}
+		else if(c == 'f'){//(A) Y
+			pitch_p -= 0.002;
+			flight_controller.update_pitch_pddd(pitch_p,-1, -1);
+			rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
+		}
+		else if(c == 't'){//X (B)
+			roll_p += 0.002;
+			flight_controller.update_roll_pddd(roll_p,-1, -1);
+			rs.printf("%d: roll P is now: %f\n\r", sw_uptime,roll_p);
+		}
+		else if(c == 'g'){//(X) B
+			roll_p -= 0.002;
+			flight_controller.update_roll_pddd(roll_p,-1, -1);
+			rs.printf("%d: roll P is now: %f\n\r", sw_uptime,roll_p);
+		}*/
+
+				//dd
+			/*}else if(c == 'h'){//A (Y)
+				pitch_dd += 0.00005;
+				flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
+				rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
+
+			}
+			else if(c == 'f'){//(A) Y
+				pitch_dd -= 0.00005;
+				flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
+				rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
+			}
+			else if(c == 't'){//X (B)
+				roll_dd += 0.00005;
+				flight_controller.update_roll_pddd(-1, -1, roll_dd);
+				rs.printf("%d: roll DD is now: %f\n\r", sw_uptime,roll_dd);
+			}
+			else if(c == 'g'){//(X) B
+				roll_dd -= 0.00005;
+				flight_controller.update_roll_pddd(-1, -1, roll_dd);
+				rs.printf("%d: roll DD is now: %f\n\r", sw_uptime,roll_dd);
+			}*/
 			else if(c == 'a'){
 				//ext_roll = 1;
 				rs.printf("Roll left.\n\r");

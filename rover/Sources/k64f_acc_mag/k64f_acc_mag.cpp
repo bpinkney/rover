@@ -13,39 +13,43 @@ k64f_sensor_interface::k64f_sensor_interface(){
 
 void k64f_sensor_interface::init(){
 	k64f_acc.enable();
+	oiad = {0,0,0};
+	oimd = {0,0,0};
 	//acc.writeRegs()
 }
 
 int k64f_sensor_interface::fetch_sensor_data(){
 
-	//pull old data
-	k64f_acc_data_t oiad = {0,0,0};
-	get_k64f_acc_data(&oiad, sizeof(oiad));
-
 	//poll sensors
 	k64f_acc.getAxis(acc_raw);
 	k64f_mag.getAxis(mag_raw);
 
-
 	//do maths
-	float acc_x = (float)((float)acc_raw.x*FXOS8700Q_00_LSB*1.003748557 - 0.0465);
-	float acc_y = (float)((float)acc_raw.y*FXOS8700Q_00_LSB*0.984794786 - 0.0720);
-	float acc_z = (float)((float)acc_raw.z*FXOS8700Q_00_LSB*0.996061268 - 0.0543);
+	acc_x = (float)((float)acc_raw.x*FXOS8700Q_00_LSB*1.003748557 - 0.0465);
+	acc_y = (float)((float)acc_raw.y*FXOS8700Q_00_LSB*0.984794786 - 0.0720);
+	acc_z = (float)((float)acc_raw.z*FXOS8700Q_00_LSB*0.996061268 - 0.0543);
+
+	mag_x = (float)(((float)mag_raw.x - 53.0)*0.9791);
+	mag_y =	(float)(((float)mag_raw.y - 17.0)*1.0006);
+	mag_z =	(float)(((float)mag_raw.z - 806.0)*1.0212);
 
 	//low pass filter (IIR)
-	LP_FILT(oiad.x, acc_x, 15);
-	LP_FILT(oiad.y, acc_y, 15);
-	LP_FILT(oiad.z, acc_z, 15);
+	LP_FILT(oiad.x, acc_x, 20);
+	LP_FILT(oiad.y, acc_y, 20);
+	LP_FILT(oiad.z, acc_z, 20);
+
+	LP_FILT(oimd.x, mag_x, 20);
+	LP_FILT(oimd.y, mag_y, 20);
+	LP_FILT(oimd.z, mag_z, 20);
 
 	set_k64f_acc_data({
 		oiad.x,
 		oiad.y,
 		oiad.z});
 	set_k64f_mag_data({
-		(float)(((float)mag_raw.x - 53.0)*0.9791),
-		(float)(((float)mag_raw.y - 17.0)*1.0006),
-		(float)(((float)mag_raw.z - 806.0)*1.0212)
-	});
+		oimd.x,
+		oimd.y,
+		oimd.z});
 	return 0;
 }
 

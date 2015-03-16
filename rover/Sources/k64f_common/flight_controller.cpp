@@ -60,16 +60,16 @@ void flight_controller_t::init(){
 
 	outer_loop_activate_count = 0;*/
 
-	pitch_p = 0;
-	roll_p = 0;
-	yaw_p = 0;
+	pitch_p = 0.08;//0.18;
+	roll_p = 0.09;//0.13;
+	yaw_p = 0;//0.028;
 
-	pitch_d = 0;
-	roll_d = 0;
-	yaw_d = 0;
+	pitch_d = 0.0095;//0.025;
+	roll_d = 0.0095;//0.027;
+	yaw_d = 0;//0.2;
 
-	pitch_dd = 0;
-	roll_dd = 0;
+	pitch_dd = 0.0009;
+	roll_dd = 0.0009;
 	yaw_dd = 0;
 
 	dt = 0.01;
@@ -197,7 +197,7 @@ void flight_controller_t::update_yaw_rate_pids(float p, float i, float d){
 	}
 }*/
 void flight_controller_t::set_test_vars(float a, float b, float c){
-	//set_craft_orientation_des({b,a,c});//rpy
+	set_craft_orientation_des({b,a,c});//rpy
 
 }
 

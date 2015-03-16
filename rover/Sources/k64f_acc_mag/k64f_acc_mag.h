@@ -28,6 +28,17 @@ private:
 	int16_t raX, raY, raZ;
 	int16_t rmX, rmY, rmZ;
 
+	k64f_acc_data_t oiad;
+	k64f_mag_data_t oimd;
+
+	float acc_x;
+	float acc_y;
+	float acc_z;
+
+	float mag_x;
+	float mag_y;
+	float mag_z;
+
 	//k64f_sensor_interface() {} (need if overloading public constructor)
 
 

@@ -88,14 +88,18 @@ void set_motor_thrust_des(motor_thrust_des_t value);
   do { var = ((float)var * ((float)N) + ((float)new_val)) / ((float)N+1); } while(false)
 
 #define WRAP_2PI(rad)		\
-  while ((rad) > M_PI/2)	\
+  while ((rad) > M_PI)		\
   {							\
-    rad -= M_PI;			\
+    rad -= 2*M_PI;			\
   }							\
-  while ((rad) < -M_PI/2)	\
+  while ((rad) < -M_PI)		\
   {							\
-    rad += M_PI;			\
+    rad += 2*M_PI;			\
   }							\
 
+#define WRAP_TO_PI(x) (x < -M_PI ? x+M_PI*2 : (x > M_PI ? x - M_PI*2: x))
+
 #endif
+
+
 

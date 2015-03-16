@@ -55,11 +55,11 @@ void orientation_estimator_t::run_estimate_loop(){
 
 	//pc.printf("Gyro Data [XYZ] [%f, %f, %f]\n\r", egd.x, egd.y, egd.z);
 
-	roll = gyro_trust*(o_orient.roll + (egd.x*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.x,sqrt(pow(iad.y,2) + pow(iad.z,2)));
-	pitch = gyro_trust*(o_orient.pitch + (egd.y*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.y,sqrt(pow(iad.x,2) + pow(iad.z,2)));
+	roll = gyro_trust*(o_orient.roll + (egd.y*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(-iad.x,sqrt(pow(iad.y,2) + pow(iad.z,2)));
+	pitch = gyro_trust*(o_orient.pitch + (egd.x*((float)imu_read_period)/1000)) + acc_trust*(float)atan2(iad.y,sqrt(pow(iad.x,2) + pow(iad.z,2)));
 
-	yaw = atan2(imd.z*sin(pitch) - cos(pitch)*imd.y, cos(roll)*imd.x - imd.y*sin(pitch)*sin(roll) - cos(pitch)*imd.z*sin(roll));
-
+	//old as of mar 14 yaw = atan2(imd.z*sin(pitch) - cos(pitch)*imd.y, cos(roll)*imd.x - imd.y*sin(pitch)*sin(roll) - cos(pitch)*imd.z*sin(roll));
+	yaw = -atan2(cos(pitch)*imd.y - imd.z*sin(pitch), cos(roll)*imd.x + imd.y*sin(pitch)*sin(roll) + cos(pitch)*imd.z*sin(roll));
 	set_craft_orientation_est({roll, pitch, yaw}); //radians
 
 	//ang acc est

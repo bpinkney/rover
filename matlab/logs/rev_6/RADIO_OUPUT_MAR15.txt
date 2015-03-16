@@ -1,0 +1,2023 @@
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle Killed
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+196250: desired roll angle is now: -0.250000 deg
+
+196560: desired roll angle is now: 0.000000 deg
+
+196630: desired roll angle is now: 0.250000 deg
+
+Throttle set to: '0.650000' percent.
+
+197260: desired roll angle is now: 0.500000 deg
+
+197590: desired roll angle is now: 0.250000 deg
+
+197780: desired roll angle is now: 0.500000 deg
+
+198220: desired roll angle is now: 0.250000 deg
+
+Throttle set to: '0.700000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_49.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_50.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle Off.
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Killed
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_51.txt' on Thu Jan  1 00:00:01 1970
+
+
+3270: roll D is now: 0.000500
+
+3600: roll D is now: 0.000000
+
+3870: pitch D is now: 0.000500
+
+4180: pitch D is now: 0.000000
+
+5100: pitch D is now: 0.000500
+
+5370: pitch D is now: 0.000000
+
+5550: roll D is now: 0.000500
+
+5810: roll D is now: 0.000000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+18510: roll D is now: 0.000500
+
+18630: roll D is now: 0.001000
+
+18760: roll D is now: 0.001500
+
+19000: roll D is now: 0.002000
+
+19640: pitch D is now: 0.000500
+
+19760: pitch D is now: 0.001000
+
+19830: pitch D is now: 0.001500
+
+20200: roll D is now: 0.002500
+
+20330: roll D is now: 0.003000
+
+20460: pitch D is now: 0.002000
+
+20640: roll D is now: 0.003500
+
+20820: pitch D is now: 0.002500
+
+21880: roll D is now: 0.004000
+
+22070: pitch D is now: 0.003000
+
+Throttle set to: '0.600000' percent.
+
+26580: roll D is now: 0.003500
+
+26700: pitch D is now: 0.002500
+
+26830: roll D is now: 0.003000
+
+26900: pitch D is now: 0.002000
+
+26970: roll D is now: 0.002500
+
+27100: pitch D is now: 0.001500
+
+27220: roll D is now: 0.002000
+
+27280: pitch D is now: 0.001000
+
+27480: roll D is now: 0.001500
+
+27610: pitch D is now: 0.000500
+
+Throttle Killed
+
+33650: roll D is now: 0.001000
+
+33900: roll D is now: 0.000500
+
+34140: pitch D is now: 0.000000
+
+34270: pitch D is now: -0.000500
+
+34460: pitch D is now: 0.000000
+
+34640: roll D is now: -0.000000
+
+35150: roll D is now: 0.000500
+
+35330: roll D is now: -0.000000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+66010: roll D is now: 0.000500
+
+66380: roll D is now: 0.001000
+
+70730: roll D is now: 0.001500
+
+71060: roll D is now: 0.002000
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle Killed
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_52.txt' on Thu Jan  1 00:00:01 1970
+
+
+2600: roll P is now: 0.131000
+
+3120: roll P is now: 0.132000
+
+3390: roll P is now: 0.131000
+
+3550: roll P is now: 0.130000
+
+3900: roll P is now: 0.129000
+
+4090: roll P is now: 0.128000
+
+4360: roll P is now: 0.129000
+
+4420: roll P is now: 0.130000
+
+6540: roll P is now: 0.129000
+
+6540: roll P is now: 0.128000
+
+6600: roll P is now: 0.127000
+
+6670: roll P is now: 0.126000
+
+6740: roll P is now: 0.125000
+
+6800: roll P is now: 0.124000
+
+6870: roll P is now: 0.123000
+
+6940: roll P is now: 0.122000
+
+7000: roll P is now: 0.121000
+
+7070: roll P is now: 0.120000
+
+7200: roll P is now: 0.119000
+
+7390: roll P is now: 0.118000
+
+7440: roll P is now: 0.117000
+
+7550: roll P is now: 0.116000
+
+7610: roll P is now: 0.115000
+
+7770: roll P is now: 0.114000
+
+7970: roll P is now: 0.113000
+
+8030: roll P is now: 0.112000
+
+8100: roll P is now: 0.111000
+
+8150: roll P is now: 0.110000
+
+8210: roll P is now: 0.109000
+
+8280: roll P is now: 0.108000
+
+8330: roll P is now: 0.107000
+
+8390: roll P is now: 0.106000
+
+8390: roll P is now: 0.105000
+
+8460: roll P is now: 0.104000
+
+8510: roll P is now: 0.103000
+
+8570: roll P is now: 0.102000
+
+8640: roll P is now: 0.101000
+
+8690: roll P is now: 0.100000
+
+8760: roll P is now: 0.099000
+
+8830: roll P is now: 0.098000
+
+8880: roll P is now: 0.097000
+
+8880: roll P is now: 0.096000
+
+8950: roll P is now: 0.095000
+
+9020: roll P is now: 0.094000
+
+9070: roll P is now: 0.093000
+
+9120: roll P is now: 0.092000
+
+9170: roll P is now: 0.091000
+
+9240: roll P is now: 0.090000
+
+9300: roll P is now: 0.089000
+
+9360: roll P is now: 0.088000
+
+9430: roll P is now: 0.087000
+
+9490: roll P is now: 0.086000
+
+9550: roll P is now: 0.085000
+
+9550: roll P is now: 0.084000
+
+9630: roll P is now: 0.083000
+
+9690: roll P is now: 0.082000
+
+9750: roll P is now: 0.081000
+
+9860: roll P is now: 0.080000
+
+9900: roll P is now: 0.079000
+
+9960: roll P is now: 0.078000
+
+10030: roll P is now: 0.077000
+
+10100: roll P is now: 0.076000
+
+10220: roll P is now: 0.075000
+
+10290: roll P is now: 0.074000
+
+10480: roll P is now: 0.073000
+
+10600: roll P is now: 0.072000
+
+10670: roll P is now: 0.071000
+
+10730: roll P is now: 0.070000
+
+10800: roll P is now: 0.069000
+
+10870: roll P is now: 0.068000
+
+10930: roll P is now: 0.067000
+
+10930: roll P is now: 0.066000
+
+10990: roll P is now: 0.065000
+
+11060: roll P is now: 0.064000
+
+11120: roll P is now: 0.063000
+
+11190: roll P is now: 0.062000
+
+11310: roll P is now: 0.061000
+
+11370: roll P is now: 0.060000
+
+11430: roll P is now: 0.059000
+
+11480: roll P is now: 0.058000
+
+11540: roll P is now: 0.057000
+
+11640: roll P is now: 0.056000
+
+11700: roll P is now: 0.055000
+
+11860: roll P is now: 0.054000
+
+11930: roll P is now: 0.053000
+
+12050: roll P is now: 0.052000
+
+12190: roll P is now: 0.051000
+
+12380: roll P is now: 0.050000
+
+12690: pitch P is now: 0.179000
+
+12760: pitch P is now: 0.178000
+
+12820: pitch P is now: 0.177000
+
+12890: pitch P is now: 0.176000
+
+13020: pitch P is now: 0.175000
+
+13090: pitch P is now: 0.174000
+
+13160: pitch P is now: 0.173000
+
+13350: pitch P is now: 0.172000
+
+13400: pitch P is now: 0.171000
+
+13460: pitch P is now: 0.170000
+
+13520: pitch P is now: 0.169000
+
+13870: pitch P is now: 0.168000
+
+14520: pitch P is now: 0.167000
+
+14580: pitch P is now: 0.166000
+
+14680: pitch P is now: 0.165000
+
+14740: pitch P is now: 0.164000
+
+14780: pitch P is now: 0.163000
+
+20850: pitch P is now: 0.164000
+
+21100: pitch P is now: 0.163000
+
+21230: roll P is now: 0.051000
+
+21530: roll P is now: 0.050000
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+
+2010: roll P is now: 0.005000
+Flight Log Started as '/sdcard/flight_log_53.txt' on Thu Jan  1 00:00:01 1970
+
+
+2270: roll P is now: -0.000000
+
+2660: roll P is now: 0.005000
+
+2860: roll P is now: -0.000000
+
+3060: pitch P is now: 0.005000
+
+3260: pitch P is now: -0.000000
+
+3670: pitch P is now: 0.005000
+
+3870: pitch P is now: -0.000000
+
+9300: roll P is now: 0.005000
+
+9490: roll P is now: 0.010000
+
+9670: roll P is now: 0.015000
+
+9820: roll P is now: 0.020000
+
+10000: roll P is now: 0.025000
+
+10330: roll P is now: 0.020000
+
+10460: roll P is now: 0.015000
+
+10530: roll P is now: 0.010000
+
+10660: roll P is now: 0.005000
+
+10890: roll P is now: -0.000000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+21490: roll P is now: 0.005000
+
+21900: roll P is now: -0.000000
+
+22070: pitch P is now: 0.005000
+
+22260: pitch P is now: 0.010000
+
+22650: pitch P is now: 0.015000
+
+25710: pitch P is now: 0.020000
+
+25900: pitch P is now: 0.025000
+
+26400: pitch P is now: 0.030000
+
+26720: pitch P is now: 0.035000
+
+26960: pitch P is now: 0.040000
+
+27240: pitch P is now: 0.045000
+
+27570: pitch P is now: 0.050000
+
+27830: pitch P is now: 0.055000
+
+28030: pitch P is now: 0.060000
+
+28270: pitch P is now: 0.065000
+
+28610: pitch P is now: 0.070000
+
+28980: pitch P is now: 0.075000
+
+29250: pitch P is now: 0.080000
+
+29500: pitch P is now: 0.085000
+
+29760: pitch P is now: 0.090000
+
+30060: pitch P is now: 0.095000
+
+30300: pitch P is now: 0.100000
+
+30510: pitch P is now: 0.105000
+
+30830: pitch P is now: 0.110000
+
+31040: pitch P is now: 0.115000
+
+31300: pitch P is now: 0.120000
+
+31510: pitch P is now: 0.125000
+
+31740: pitch P is now: 0.130000
+
+31940: pitch P is now: 0.135000
+
+32190: pitch P is now: 0.140000
+
+32440: pitch P is now: 0.145000
+
+32560: pitch P is now: 0.150000
+
+32800: pitch P is now: 0.155000
+
+33000: pitch P is now: 0.160000
+
+33200: pitch P is now: 0.165000
+
+Throttle set to: '0.550000' percent.
+
+44130: pitch P is now: 0.170000
+
+44320: pitch P is now: 0.175000
+
+44640: pitch P is now: 0.180000
+
+46370: pitch P is now: 0.175000
+
+46490: pitch P is now: 0.170000
+
+46620: pitch P is now: 0.165000
+
+46810: pitch P is now: 0.160000
+
+47990: pitch P is now: 0.155000
+
+48250: pitch P is now: 0.150000
+
+48510: pitch P is now: 0.145000
+
+48730: pitch P is now: 0.140000
+
+49010: pitch P is now: 0.135000
+
+51890: pitch P is now: 0.130000
+
+52470: pitch P is now: 0.125000
+
+53820: pitch P is now: 0.120000
+
+54290: pitch P is now: 0.115000
+
+60680: roll P is now: 0.005000
+
+60820: roll P is now: 0.010000
+
+61060: roll P is now: 0.015000
+
+61840: roll P is now: 0.020000
+
+62090: roll P is now: 0.025000
+
+62340: roll P is now: 0.030000
+
+62620: roll P is now: 0.035000
+
+62910: roll P is now: 0.040000
+
+63170: roll P is now: 0.045000
+
+63630: roll P is now: 0.050000
+
+63890: roll P is now: 0.055000
+
+64830: roll P is now: 0.060000
+
+65370: roll P is now: 0.065000
+
+68230: pitch P is now: 0.110000
+
+68810: roll P is now: 0.070000
+
+69040: roll P is now: 0.075000
+
+69670: roll P is now: 0.080000
+
+70250: roll P is now: 0.085000
+
+70580: roll P is now: 0.090000
+
+72220: roll P is now: 0.095000
+
+72930: roll P is now: 0.100000
+
+75040: pitch P is now: 0.105000
+
+75240: pitch P is now: 0.100000
+
+76070: pitch P is now: 0.095000
+
+76210: pitch P is now: 0.090000
+
+76280: pitch P is now: 0.085000
+
+76390: pitch P is now: 0.080000
+
+76460: pitch P is now: 0.075000
+
+76580: pitch P is now: 0.070000
+
+76710: pitch P is now: 0.065000
+
+76840: pitch P is now: 0.060000
+
+77040: pitch P is now: 0.055000
+
+77490: pitch P is now: 0.050000
+
+78080: roll P is now: 0.105000
+
+78340: roll P is now: 0.110000
+
+78640: roll P is now: 0.115000
+
+79490: roll P is now: 0.120000
+
+80070: roll P is now: 0.125000
+
+82840: roll P is now: 0.130000
+
+83020: roll P is now: 0.135000
+
+84840: pitch P is now: 0.055000
+
+84910: pitch P is now: 0.060000
+
+85100: pitch P is now: 0.065000
+
+85300: pitch P is now: 0.070000
+
+85690: pitch P is now: 0.075000
+
+Throttle set to: '0.600000' percent.
+
+97160: roll P is now: 0.140000
+
+97450: roll P is now: 0.135000
+
+97710: pitch P is now: 0.080000
+
+98170: pitch P is now: 0.085000
+
+98450: pitch P is now: 0.090000
+
+98630: pitch P is now: 0.095000
+
+98890: pitch P is now: 0.100000
+
+99200: pitch P is now: 0.105000
+
+99560: pitch P is now: 0.110000
+
+99930: pitch P is now: 0.115000
+
+100450: pitch P is now: 0.120000
+
+102180: pitch P is now: 0.125000
+
+103320: pitch P is now: 0.130000
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_54.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle Off.
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+32840: roll P is now: 0.005000
+
+32970: pitch P is now: 0.005000
+
+33150: roll P is now: 0.010000
+
+33290: pitch P is now: 0.010000
+
+33420: roll P is now: 0.015000
+
+33480: pitch P is now: 0.015000
+
+33610: roll P is now: 0.020000
+
+33740: pitch P is now: 0.020000
+
+33870: roll P is now: 0.025000
+
+34010: pitch P is now: 0.025000
+
+34070: roll P is now: 0.030000
+
+34140: pitch P is now: 0.030000
+
+34260: roll P is now: 0.035000
+
+34400: pitch P is now: 0.035000
+
+34520: roll P is now: 0.040000
+
+34650: pitch P is now: 0.040000
+
+34780: roll P is now: 0.045000
+
+34900: pitch P is now: 0.045000
+
+35110: roll P is now: 0.050000
+
+35170: pitch P is now: 0.050000
+
+35410: roll P is now: 0.055000
+
+35510: pitch P is now: 0.055000
+
+35690: roll P is now: 0.060000
+
+35810: pitch P is now: 0.060000
+
+36070: roll P is now: 0.065000
+
+36200: pitch P is now: 0.065000
+
+36340: roll P is now: 0.070000
+
+36450: pitch P is now: 0.070000
+
+36590: roll P is now: 0.075000
+
+37240: pitch P is now: 0.075000
+
+42480: roll P is now: 0.080000
+
+42550: pitch P is now: 0.080000
+
+42790: roll P is now: 0.085000
+
+42850: pitch P is now: 0.085000
+
+44550: roll P is now: 0.090000
+
+44640: pitch P is now: 0.090000
+
+45410: roll P is now: 0.095000
+
+45480: pitch P is now: 0.095000
+
+45810: roll P is now: 0.100000
+
+45920: pitch P is now: 0.100000
+
+56500: pitch P is now: 0.095000
+
+56640: pitch P is now: 0.090000
+
+56820: pitch P is now: 0.085000
+
+57020: pitch P is now: 0.080000
+
+57140: pitch P is now: 0.075000
+
+57340: pitch P is now: 0.070000
+
+76850: pitch P is now: 0.065000
+
+78430: pitch P is now: 0.070000
+
+78480: pitch P is now: 0.065001
+
+78730: roll P is now: 0.105000
+
+78850: roll P is now: 0.100000
+
+83640: roll P is now: 0.095000
+
+83770: roll P is now: 0.090000
+
+84160: roll P is now: 0.085000
+
+87260: roll P is now: 0.080000
+
+87520: roll P is now: 0.075000
+
+88500: roll P is now: 0.070000
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_55.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_56.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle Off.
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+10690: roll P is now: 0.005000
+
+10890: pitch P is now: 0.005000
+
+11020: roll P is now: 0.010000
+
+11130: pitch P is now: 0.010000
+
+11260: roll P is now: 0.015000
+
+11390: pitch P is now: 0.015000
+
+11460: roll P is now: 0.020000
+
+11590: pitch P is now: 0.020000
+
+11710: roll P is now: 0.025000
+
+11830: pitch P is now: 0.025000
+
+11960: roll P is now: 0.030000
+
+12020: pitch P is now: 0.030000
+
+12140: roll P is now: 0.035000
+
+12240: pitch P is now: 0.035000
+
+12350: roll P is now: 0.040000
+
+12490: pitch P is now: 0.040000
+
+12620: roll P is now: 0.045000
+
+12740: pitch P is now: 0.045000
+
+12850: roll P is now: 0.050000
+
+12920: pitch P is now: 0.050000
+
+13050: roll P is now: 0.055000
+
+13190: pitch P is now: 0.055000
+
+13300: roll P is now: 0.060000
+
+13420: pitch P is now: 0.060000
+
+13480: roll P is now: 0.065000
+
+13590: pitch P is now: 0.065000
+
+13670: roll P is now: 0.070000
+
+13800: pitch P is now: 0.070000
+
+30520: roll P is now: 0.075000
+
+31250: roll P is now: 0.080000
+
+31410: roll P is now: 0.085000
+
+31610: roll P is now: 0.090000
+
+48960: pitch P is now: 0.075000
+
+49100: pitch P is now: 0.080000
+
+49280: pitch P is now: 0.085000
+
+49410: pitch P is now: 0.090000
+
+58720: pitch P is now: 0.085000
+
+58970: pitch P is now: 0.080000
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Off.
+
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_57.txt' on Thu Jan  1 00:00:01 1970
+
+
+13020: roll D is now: 0.000500
+
+13300: roll D is now: 0.000000
+
+13480: pitch D is now: 0.000500
+
+13610: pitch D is now: 0.000000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Roll left.
+
+Throttle set to: '0.550000' percent.
+
+27900: pitch D is now: 0.000500
+
+28220: pitch D is now: 0.000000
+
+29260: roll D is now: 0.000500
+
+31920: roll D is now: 0.001000
+
+32180: roll D is now: 0.000500
+
+34060: roll D is now: 0.001000
+
+34440: roll D is now: 0.001500
+
+34620: roll D is now: 0.002000
+
+34980: roll D is now: 0.002500
+
+35220: roll D is now: 0.003000
+
+39070: roll D is now: 0.003500
+
+39210: roll D is now: 0.004000
+
+39380: roll D is now: 0.004500
+
+46910: pitch D is now: 0.000500
+
+48660: pitch D is now: 0.001000
+
+48920: pitch D is now: 0.001500
+
+49020: pitch D is now: 0.002000
+
+51900: pitch D is now: 0.002500
+
+52100: pitch D is now: 0.003000
+
+52430: pitch D is now: 0.003500
+
+58710: pitch D is now: 0.004000
+
+58830: pitch D is now: 0.004500
+
+58950: pitch D is now: 0.005007
+
+59040: pitch D is now: 0.005500
+
+62100: pitch D is now: 0.006000
+
+62240: pitch D is now: 0.006500
+
+62370: pitch D is now: 0.007000
+
+66600: pitch D is now: 0.007500
+
+66720: pitch D is now: 0.008000
+
+66840: pitch D is now: 0.008500
+
+74960: roll D is now: 0.005000
+
+75030: roll D is now: 0.005500
+
+75150: roll D is now: 0.006000
+
+75240: roll D is now: 0.006500
+
+77910: roll D is now: 0.007000
+
+77980: roll D is now: 0.007500
+
+78090: roll D is now: 0.008000
+
+78150: roll D is now: 0.008500
+
+80940: roll D is now: 0.009000
+
+81060: roll D is now: 0.009500
+
+81200: roll D is now: 0.010000
+
+81600: roll D is now: 0.010500
+
+81800: roll D is now: 0.011000
+
+104040: roll D is now: 0.011500
+
+104040: pitch D is now: 0.009000
+
+104170: roll D is now: 0.012000
+
+104280: pitch D is now: 0.009500
+
+104370: roll D is now: 0.012500
+
+104480: pitch D is now: 0.010000
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle Killed
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_58.txt' on Thu Jan  1 00:00:01 1970
+
+
+8850: roll D is now: 0.000500
+
+8980: pitch D is now: 0.000500
+
+9120: roll D is now: 0.001000
+
+9180: pitch D is now: 0.001000
+
+9250: roll D is now: 0.001500
+
+9380: pitch D is now: 0.001500
+
+9450: roll D is now: 0.002000
+
+9570: pitch D is now: 0.002000
+
+9610: roll D is now: 0.002500
+
+9690: pitch D is now: 0.002500
+
+9750: roll D is now: 0.003000
+
+9890: pitch D is now: 0.003000
+
+10010: roll D is now: 0.003500
+
+10150: pitch D is now: 0.003500
+
+10210: roll D is now: 0.004000
+
+10280: pitch D is now: 0.004000
+
+10350: roll D is now: 0.004500
+
+10410: pitch D is now: 0.004500
+
+10480: roll D is now: 0.005000
+
+10520: pitch D is now: 0.005000
+
+10570: roll D is now: 0.005500
+
+10610: pitch D is now: 0.005500
+
+10660: roll D is now: 0.006000
+
+10710: pitch D is now: 0.006000
+
+10780: roll D is now: 0.006500
+
+10840: pitch D is now: 0.006500
+
+10910: roll D is now: 0.007000
+
+10970: pitch D is now: 0.007000
+
+11030: roll D is now: 0.007500
+
+11090: pitch D is now: 0.007500
+
+11150: roll D is now: 0.008000
+
+11200: pitch D is now: 0.008000
+
+11250: roll D is now: 0.008500
+
+11300: pitch D is now: 0.008500
+
+11340: roll D is now: 0.009000
+
+11410: pitch D is now: 0.009000
+
+11540: roll D is now: 0.009500
+
+11540: pitch D is now: 0.009500
+
+11600: roll D is now: 0.010000
+
+11720: pitch D is now: 0.010000
+
+11780: roll D is now: 0.010500
+
+12410: roll D is now: 0.010000
+
+12730: pitch D is now: 0.009500
+
+12920: roll D is now: 0.010500
+
+13270: pitch D is now: 0.010000
+
+13410: pitch D is now: 0.009500
+
+13550: roll D is now: 0.011000
+
+13730: roll D is now: 0.010500
+
+14280: roll D is now: 0.010000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+27500: roll D is now: 0.010500
+
+27760: roll D is now: 0.011000
+
+27970: roll D is now: 0.011500
+
+28200: roll D is now: 0.012000
+
+34490: roll D is now: 0.011500
+
+34630: roll D is now: 0.011000
+
+34750: roll D is now: 0.010500
+
+34950: roll D is now: 0.010000
+
+35200: roll D is now: 0.009500
+
+35330: roll D is now: 0.009000
+
+35670: roll D is now: 0.008500
+
+35860: roll D is now: 0.008000
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Off.
+
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_59.txt' on Thu Jan  1 00:00:01 1970
+
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+14840: roll DD is now: 0.000050
+
+15040: roll DD is now: -0.000000
+
+20130: roll DD is now: 0.000050
+
+20240: roll DD is now: 0.000100
+
+20440: roll DD is now: 0.000150
+
+20560: roll DD is now: 0.000200
+
+24050: roll DD is now: 0.000250
+
+24180: roll DD is now: 0.000300
+
+24300: roll DD is now: 0.000350
+
+24410: roll DD is now: 0.000400
+
+24480: roll DD is now: 0.000450
+
+24540: roll DD is now: 0.000500
+
+24670: roll DD is now: 0.000550
+
+24800: roll DD is now: 0.000600
+
+25000: roll DD is now: 0.000650
+
+25130: roll DD is now: 0.000700
+
+25230: roll DD is now: 0.000750
+
+25390: roll DD is now: 0.000800
+
+25570: roll DD is now: 0.000850
+
+25770: roll DD is now: 0.000900
+
+26160: roll DD is now: 0.000950
+
+26280: roll DD is now: 0.001000
+
+39830: pitch DD is now: 0.000050
+
+39960: pitch DD is now: 0.000100
+
+40030: pitch DD is now: 0.000150
+
+40160: pitch DD is now: 0.000200
+
+40220: pitch DD is now: 0.000250
+
+40290: pitch DD is now: 0.000300
+
+40390: pitch DD is now: 0.000350
+
+40450: pitch DD is now: 0.000400
+
+40490: pitch DD is now: 0.000450
+
+40560: pitch DD is now: 0.000500
+
+40620: pitch DD is now: 0.000550
+
+40690: pitch DD is now: 0.000600
+
+40750: pitch DD is now: 0.000650
+
+40810: pitch DD is now: 0.000700
+
+40950: pitch DD is now: 0.000750
+
+41010: pitch DD is now: 0.000800
+
+41080: pitch DD is now: 0.000850
+
+41210: pitch DD is now: 0.000900
+
+41340: pitch DD is now: 0.000950
+
+41530: pitch DD is now: 0.001000
+
+68650: roll DD is now: 0.001050
+
+68720: pitch DD is now: 0.001050
+
+68780: roll DD is now: 0.001100
+
+68910: pitch DD is now: 0.001100
+
+69040: roll DD is now: 0.001150
+
+69170: pitch DD is now: 0.001150
+
+69240: roll DD is now: 0.001200
+
+69370: pitch DD is now: 0.001200
+
+69520: roll DD is now: 0.001250
+
+69630: pitch DD is now: 0.001250
+
+69820: roll DD is now: 0.001300
+
+69950: pitch DD is now: 0.001300
+
+70800: roll DD is now: 0.001350
+
+70870: pitch DD is now: 0.001350
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Off.
+
+
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_60.txt' on Thu Jan  1 00:00:01 1970
+
+
+5350: roll P is now: 0.092000
+
+5670: roll P is now: 0.090000
+
+5810: pitch P is now: 0.082000
+
+5990: pitch P is now: 0.080000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+23300: pitch P is now: 0.082000
+
+23560: pitch P is now: 0.080000
+
+23700: roll P is now: 0.092000
+
+23860: roll P is now: 0.094000
+
+23990: roll P is now: 0.096000
+
+24190: roll P is now: 0.098000
+
+24380: roll P is now: 0.100000
+
+26790: roll P is now: 0.102000
+
+28210: roll P is now: 0.104000
+
+28400: roll P is now: 0.106000
+
+28530: roll P is now: 0.108000
+
+28530: roll P is now: 0.110000
+
+28730: roll P is now: 0.112000
+
+28920: roll P is now: 0.110000
+
+50900: pitch P is now: 0.082000
+
+51090: pitch P is now: 0.084000
+
+51230: pitch P is now: 0.086000
+
+51340: pitch P is now: 0.088000
+
+51410: pitch P is now: 0.090000
+
+51540: pitch P is now: 0.092000
+
+51730: pitch P is now: 0.094000
+
+51790: pitch P is now: 0.096000
+
+51860: pitch P is now: 0.098000
+
+51860: pitch P is now: 0.100000
+
+51920: pitch P is now: 0.102000
+
+52160: pitch P is now: 0.100000
+
+Throttle Killed
+
+Throttle start to: '0.250000' percent.
+
+Throttle Off.
+
+74970: roll P is now: 0.112000
+
+75090: roll P is now: 0.110000
+
+75400: pitch P is now: 0.102000
+
+75500: pitch P is now: 0.100000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+118960: roll P is now: 0.112000
+
+119080: pitch P is now: 0.102064
+
+119170: roll P is now: 0.114000
+
+119270: pitch P is now: 0.104000
+
+119400: roll P is now: 0.116000
+
+119600: pitch P is now: 0.106000
+
+119730: roll P is now: 0.118000
+
+119820: pitch P is now: 0.108000
+
+119930: roll P is now: 0.120000
+
+120070: pitch P is now: 0.110000
+
+120200: roll P is now: 0.122000
+
+120330: pitch P is now: 0.112000
+
+120460: roll P is now: 0.124000
+
+120590: pitch P is now: 0.114000
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Off.
+
+
+
+140960: pitch P is now: 0.112000
+
+141090: roll P is now: 0.122000
+
+141340: pitch P is now: 0.110000
+
+141530: pitch P is now: 0.108000
+
+141660: pitch P is now: 0.106000
+
+141850: pitch P is now: 0.104000
+
+141980: pitch P is now: 0.102000
+
+142180: pitch P is now: 0.100000
+
+142370: pitch P is now: 0.098000
+
+142550: pitch P is now: 0.10007
+
+142690: roll P is now: 0.120000
+
+142690: roll P is now: 0.118000
+
+142810: roll P is now: 0.116000
+
+142950: roll P is now: 0.114000
+
+143070: roll P is now: 0.112000
+
+143140: roll P is now: 0.110000
+
+143200: roll P is now: 0.108000
+
+143270: roll P is now: 0.106000
+
+143330: roll P is now: 0.104000
+
+143460: roll P is now: 0.106000
+
+143530: roll P is now: 0.108000
+
+143650: roll P is now: 0.10600
+
+143710: roll P is now: 0.104000
+
+143750: roll P is now: 0.102000
+
+143800: roll P is now: 0.100000
+
+143980: roll P is now: 0.098000
+
+144120: roll P is now: 0.100000
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+Throttle set to: '0.650000' percent.
+
+Throttle Killed
+
+166820: pitch P is now: 0.098000
+
+167010: roll P is now: 0.098000
+
+169030: pitch P is now: 0.096000
+
+169160: roll P is now: 0.096000
+
+169280: pitch P is now: 0.094031
+
+169370: roll P is now: 0.094000
+
+169420: pitch P is now: 0.092000
+
+169530: roll P is now: 0.092000
+
+169650: pitch P is now: 0.090000
+
+169780: roll P is now: 0.090000
+Welcome to ROVER Remote Logging and Control
+RADIO: Polling for remote chars...
+
+
+START
+Start Sensors...
+
+
+IMUS: External IMU Init Ack = 0
+Starting Estimator
+MOTORS: initialize ESCs
+ESC initialized
+Starting Flight Controller
+Flight Log Starting...
+Flight Log Started as '/sdcard/flight_log_61.txt' on Thu Jan  1 00:00:01 1970
+
+
+9830: roll D is now: 0.010000
+
+10220: roll D is now: 0.009500
+
+10410: pitch D is now: 0.010000
+
+10680: pitch D is now: 0.009500
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+16000: pitch D is now: 0.010000
+
+16260: pitch D is now: 0.009500
+
+16450: roll D is now: 0.010000
+
+16580: roll D is now: 0.010500
+
+16650: roll D is now: 0.011000
+
+16810: roll D is now: 0.011500
+
+16960: roll D is now: 0.012000
+
+43040: pitch D is now: 0.010000
+
+43350: pitch D is now: 0.010500
+
+43540: pitch D is now: 0.011000
+
+43610: pitch D is now: 0.011500
+
+43870: pitch D is now: 0.012000
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.250000' percent.
+
+Throttle Off.
+
+58060: roll D is now: 0.012500
+
+58270: pitch D is now: 0.012500
+
+58400: roll D is now: 0.013000
+
+58530: pitch D is now: 0.013000
+
+58600: roll D is now: 0.013500
+
+58650: pitch D is now: 0.013500
+
+58780: roll D is now: 0.014000
+
+58910: pitch D is now: 0.014000
+
+59040: roll D is now: 0.014500
+
+59180: pitch D is now: 0.014500
+
+59390: roll D is now: 0.015000
+
+59640: pitch D is now: 0.01500
+
+Throttle start to: '0.250000' percent.
+
+Throttle set to: '0.300000' percent.
+
+Throttle set to: '0.350000' percent.
+
+Throttle set to: '0.400000' percent.
+
+Throttle set to: '0.450000' percent.
+
+Throttle set to: '0.500000' percent.
+
+Throttle set to: '0.550000' percent.
+
+Throttle set to: '0.600000' percent.
+
+68570: roll D is now: 0.015500
+
+68610: pitch D is now: 0.015500
+
+68750: roll D is now: 0.016000
+
+68750: pitch D is now: 0.016000
+
+68880: roll D is now: 0.016500
+
+69010: pitch D is now: 0.016500
+
+Throttle Killed
