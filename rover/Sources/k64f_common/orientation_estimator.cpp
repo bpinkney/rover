@@ -51,7 +51,7 @@ void orientation_estimator_t::run_estimate_loop(){
 	get_ext_gyro_data(&egd, sizeof(egd));
 	get_k64f_acc_data(&iad, sizeof(iad));
 	get_k64f_mag_data(&imd, sizeof(imd));
-	get_craft_orientation_est(&o_orient, sizeof(o_orient));
+	//get_craft_orientation_est(&o_orient, sizeof(o_orient));
 
 	//pc.printf("Gyro Data [XYZ] [%f, %f, %f]\n\r", egd.x, egd.y, egd.z);
 
@@ -60,21 +60,30 @@ void orientation_estimator_t::run_estimate_loop(){
 
 	//old as of mar 14 yaw = atan2(imd.z*sin(pitch) - cos(pitch)*imd.y, cos(roll)*imd.x - imd.y*sin(pitch)*sin(roll) - cos(pitch)*imd.z*sin(roll));
 	yaw = -atan2(cos(pitch)*imd.y - imd.z*sin(pitch), cos(roll)*imd.x + imd.y*sin(pitch)*sin(roll) + cos(pitch)*imd.z*sin(roll));
-	set_craft_orientation_est({roll, pitch, yaw}); //radians
+
+	//rotate coordinate frame by 45 degrees to align pitch and roll axes to prop arms
+	roll_rot = 0.7071*roll - 0.7071*pitch;
+	pitch_rot = 0.7071*pitch + 0.7071*roll;
+
+	set_craft_orientation_est({roll_rot, pitch_rot, yaw}); //radians
 
 	//ang acc est
 	acc_est.pitch = (egd.x - last_egd.x)/dt;
 	acc_est.roll = (egd.y - last_egd.y)/dt;
 	acc_est.yaw = (egd.z - last_egd.z)/dt;
+
 	//may want to filter this acc value a bit (derivatives are noisy)
-	LP_FILT(last_acc_est.pitch, acc_est.pitch, 10); // at 100Hz this results in 10Hz filtering
-	LP_FILT(last_acc_est.roll, acc_est.roll, 10);
+	LP_FILT(last_acc_est.pitch, 0.7071*acc_est.pitch + 0.7071*acc_est.roll , 10); // at 100Hz this results in 10Hz filtering
+	LP_FILT(last_acc_est.roll, 0.7071*acc_est.roll - 0.7071*acc_est.pitch, 10);
 	LP_FILT(last_acc_est.yaw, acc_est.yaw, 10);
 
 	set_craft_accs_est({last_acc_est.roll, last_acc_est.pitch, last_acc_est.yaw});
 
 	//set gyro vals for next cycle ang acc calc
 	last_egd = egd; //(needs to have explicitly since gyros are filtered in read/sensor stage )
+	o_orient.roll = roll;
+	o_orient.pitch = pitch;
+	o_orient.yaw = yaw;
 	//set acc est for filtering stage next cycle (done in filtering stage implicitly)
 	//last_acc_est = acc_est;
 }

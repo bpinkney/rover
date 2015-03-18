@@ -75,6 +75,10 @@ private:
 	float roll_p;
 	float yaw_p;
 
+	float roll_i;
+	float pitch_i;
+	float yaw_i;
+
 	float pitch_d;
 	float roll_d;
 	float yaw_d;
@@ -83,6 +87,10 @@ private:
 	float roll_dd;
 	float yaw_dd;
 
+	float roll_integral;
+	float pitch_integral;
+	float yaw_integral;
+
 	float pitch_pos_err, roll_pos_err, yaw_pos_err;
 	float pitch_vel_err, roll_vel_err, yaw_vel_err;
 	float pitch_acc_err, roll_acc_err, yaw_acc_err;
@@ -90,6 +98,12 @@ private:
 
 	float dt;
 	float base_thrust;
+	float min_thrust;
+	float max_thrust;
+	float front_thrust, right_thrust, rear_thrust, left_thrust;
+
+	float max_vel_err;
+	float max_pos_err;
 
 	//position
 	craft_orientation_des_t orient_des;
@@ -118,6 +132,8 @@ public:
 	void update_pitch_pddd(float p, float d, float dd);
 	void update_roll_pddd(float p, float d, float dd);
 	void update_yaw_pddd(float p, float d, float dd);
+
+	void update_roll_i(float i);
 	/*void update_roll_pids(float p, float i, float d);
 	void update_pitch_pids(float p, float i, float d);
 	void update_yaw_pids(float p, float i, float d);

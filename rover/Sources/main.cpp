@@ -347,10 +347,11 @@ void run_motor_control_thread(void const *args){
 			m3 = m3_throttle;
 			m4 = m4_throttle;
 
-			m1(); //actually sets the throttle to the ESC.
-			m2();
-			m3();
-			m4();
+			//actually sets the throttle to the ESC.
+			m1(); //Front (FL)
+			//m2(); //Right (FR)
+			m3(); //Rear (RR)
+			//m4(); //Left (RL)
 
 			Thread::wait(10);  //20ms is the default period of the ESC pwm; the ESC may not run faster.
 
@@ -400,13 +401,14 @@ void run_remote_control_thread(void const *args){
 	//LR triggers: zx
 	//Select Start: kl
 
-	float pitch_p = 0.08;//0.18;
-	float pitch_d = 0.0095;//0.025;
+	float pitch_p = 2.1;//0.18;
+	float pitch_d = 0.03;//0.025;
 
-	float roll_p = 0.09;//0.13;
-	float roll_d = 0.0095;//0.027;
+	float roll_p = 0;//0.13;
+	float roll_d = 0;//0.027;
+	float roll_i = 0;
 
-	float pitch_dd = 0;
+	float pitch_dd = 0.0042;
 	float roll_dd = 0;
 
 	float des_pitch;
@@ -433,25 +435,32 @@ void run_remote_control_thread(void const *args){
 				ext_throttle = 0;
 				flight_controller.set_base_thrust(ext_throttle);
 				rs.printf("Throttle Off.\n\r");
-			}else if(c == 'x'){
-				ext_yaw = 0;
-				ext_pitch = 0;
-				ext_roll = 0;
-				rs.printf("Yaw pitch roll reset\n\r", ext_throttle);
 
+
+			}else if(c == 'x'){
+				des_roll += 10/57.29578;
+				flight_controller.set_test_vars(0, des_roll, 0);
+				rs.printf("%d: pitch des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
+
+			}else if(c == 'z'){
+				des_roll -= 10/57.29578;
+				flight_controller.set_test_vars(0, des_roll, 0);
+				rs.printf("%d: pitch des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
 				//d
 			}else if(c == 'h'){//A (Y)
 				pitch_d += 0.0005;
+				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
 
 			}
 			else if(c == 'f'){//(A) Y
 				pitch_d -= 0.0005;
+				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
 			}
-			else if(c == 't'){//X (B)
+			/*else if(c == 't'){//X (B)
 				roll_d += 0.0005;
 				flight_controller.update_roll_pddd(-1, roll_d,-1);
 				rs.printf("%d: roll D is now: %f\n\r", sw_uptime,roll_d);
@@ -460,21 +469,35 @@ void run_remote_control_thread(void const *args){
 				roll_d -= 0.0005;
 				flight_controller.update_roll_pddd(-1, roll_d,-1);
 				rs.printf("%d: roll D is now: %f\n\r", sw_uptime,roll_d);
-			}
+			}*/
 
 				//p
-		/*}else if(c == 'h'){//A (Y)
-			pitch_p += 0.002;
-			flight_controller.update_pitch_pddd(pitch_p,-1, -1);
-			rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
+		else if(c == 't'){//X (B)
+			//roll_i+=0.005;
+			//flight_controller.update_roll_i(roll_i);
+			//rs.printf("%d: roll I is now: %f\n\r", sw_uptime,roll_i);
+			pitch_dd += 0.00005;
+			flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
+			rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
+			//pitch_p += 0.005;
+			//flight_controller.update_pitch_pddd(pitch_p,-1, -1);
+			//flight_controller.update_roll_pddd(pitch_p,-1, -1);
+			//rs.printf("%d: pitch/roll P is now: %f\n\r", sw_uptime,pitch_p);
 
 		}
-		else if(c == 'f'){//(A) Y
-			pitch_p -= 0.002;
-			flight_controller.update_pitch_pddd(pitch_p,-1, -1);
-			rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
+		else if(c == 'g'){//(X) B
+			//roll_i-=0.005;
+			//flight_controller.update_roll_i(roll_i);
+			//rs.printf("%d: roll I is now: %f\n\r", sw_uptime,roll_i);
+			pitch_dd -= 0.00005;
+			flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
+			rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
+			//pitch_p -= 0.005;
+			//flight_controller.update_pitch_pddd(pitch_p,-1, -1);
+			//flight_controller.update_roll_pddd(pitch_p,-1, -1);
+			//rs.printf("%d: pitch/roll P is now: %f\n\r", sw_uptime,pitch_p);
 		}
-		else if(c == 't'){//X (B)
+		/*else if(c == 't'){//X (B)
 			roll_p += 0.002;
 			flight_controller.update_roll_pddd(roll_p,-1, -1);
 			rs.printf("%d: roll P is now: %f\n\r", sw_uptime,roll_p);
@@ -507,13 +530,17 @@ void run_remote_control_thread(void const *args){
 				flight_controller.update_roll_pddd(-1, -1, roll_dd);
 				rs.printf("%d: roll DD is now: %f\n\r", sw_uptime,roll_dd);
 			}*/
-			else if(c == 'a'){
-				//ext_roll = 1;
-				rs.printf("Roll left.\n\r");
+			else if(c == 'a'){ //(D) A
+				pitch_p -= 0.005;
+				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
+				flight_controller.update_pitch_pddd(pitch_p,-1, -1);
+				rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
 			}
-			else if(c == 'd'){
-				//ext_roll = -1;
-				rs.printf("Roll right.\n\r");
+			else if(c == 'd'){ //D (A)
+				pitch_p += 0.005;
+				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
+				flight_controller.update_pitch_pddd(pitch_p, -1, -1);
+				rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
 			}
 			else if(c == 'k'){
 				ext_throttle = 0;

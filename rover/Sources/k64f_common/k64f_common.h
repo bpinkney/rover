@@ -97,7 +97,21 @@ void set_motor_thrust_des(motor_thrust_des_t value);
     rad += 2*M_PI;			\
   }							\
 
-#define WRAP_TO_PI(x) (x < -M_PI ? x+M_PI*2 : (x > M_PI ? x - M_PI*2: x))
+//#define WRAP_TO_PI(x) (x < -M_PI ? x+M_PI*2 : (x > M_PI ? x - M_PI*2: x))
+
+#define BOUND_VARIABLE(VAR,LOW,HIGH) \
+  do \
+  { \
+    if ((VAR) < (LOW)) \
+    { \
+      (VAR) = (LOW); \
+    } \
+    else if ((VAR) > (HIGH)) \
+    { \
+      (VAR) = (HIGH); \
+    } \
+  } \
+  while (0)
 
 #endif
 

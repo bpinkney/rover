@@ -79,5 +79,33 @@ struct motor_thrust_des_t{//__attribute__ ((__packed__)) {
     float rl;
 };
 
+//IR sensor stuff
+struct top_vector_t{//__attribute__ ((__packed__)) {
+    float magnitude;
+    float trust;
+};
+
+struct side_vector_t{//__attribute__ ((__packed__)) {
+    float magnitude;
+    float trust;
+    float a;
+    float b;
+    float a_trust;
+    float b_trust;
+};
+
+struct bottom_vector_t{//__attribute__ ((__packed__)) {
+    float magnitude;
+    float trust;
+    float a;
+	float b;
+	float c;
+	float a_trust;
+	float b_trust;
+	float c_trust;
+};
+
+
+
 
 #endif

@@ -60,20 +60,32 @@ void flight_controller_t::init(){
 
 	outer_loop_activate_count = 0;*/
 
-	pitch_p = 0.08;//0.18;
-	roll_p = 0.09;//0.13;
+	pitch_p = 2.0;//0.08;//0.18;
+	roll_p = 2.1;//2.1;
 	yaw_p = 0;//0.028;
 
-	pitch_d = 0.0095;//0.025;
-	roll_d = 0.0095;//0.027;
-	yaw_d = 0;//0.2;
+	roll_i = 1;//1;
+	pitch_i = 1;
 
-	pitch_dd = 0.0009;
-	roll_dd = 0.0009;
+	pitch_d = 0.04;
+	roll_d = 0.03;//0.03;
+	yaw_d = 0;
+
+	pitch_dd = 0.0042;
+	roll_dd = 0.0042;//0.0042;
 	yaw_dd = 0;
+
+	roll_integral = 0;
+	pitch_integral = 0;
+	yaw_integral = 0;
 
 	dt = 0.01;
 	base_thrust = 0;
+	min_thrust = 0.25;
+	max_thrust = 0.95;//why not 1?
+
+	max_vel_err = 50/57.29578;
+	max_pos_err = 25/57.29578;
 
 	//ang position
 	orient_des = {0,0,0};
@@ -118,6 +130,10 @@ void flight_controller_t::update_roll_pddd(float p, float d, float dd){
 		roll_dd = dd;
 	}
 }
+void flight_controller_t::update_roll_i(float i){
+	roll_i = i;
+}
+
 void flight_controller_t::update_yaw_pddd(float p, float d, float dd){
 	if(p != -1){
 		yaw_p = p;
@@ -197,7 +213,7 @@ void flight_controller_t::update_yaw_rate_pids(float p, float i, float d){
 	}
 }*/
 void flight_controller_t::set_test_vars(float a, float b, float c){
-	set_craft_orientation_des({b,a,c});//rpy
+	set_craft_orientation_des({a,b,c});//rpy
 
 }
 
@@ -218,48 +234,89 @@ void flight_controller_t::run_control_loop(){
 	//pitch_vel_des = (orient_des - last_orient_des)/dt;
 
 	//pitch_acc_des = 0;
-	des_rates.pitch = (orient_des.pitch - last_orient_des.pitch)/dt; //(0 for holding hover position)
-	des_rates.roll = (orient_des.roll - last_orient_des.roll)/dt;
-	des_rates.yaw = (orient_des.yaw - last_orient_des.yaw)/dt;
-	//TODO write rates to mutex for printing
-
+	//des_rates.pitch = (orient_des.pitch - last_orient_des.pitch)/dt; //(0 for holding hover position)
+	//des_rates.roll = (orient_des.roll - last_orient_des.roll)/dt;
+	//des_rates.yaw = (orient_des.yaw - last_orient_des.yaw)/dt;
 
 	//control input errs (des - actual)
+	//TODO limit pos_err to max
 	pitch_pos_err = orient_des.pitch - orient_est.pitch; //orientation err
 	roll_pos_err = orient_des.roll - orient_est.roll;
 	yaw_pos_err = orient_des.yaw - orient_est.yaw;
 	WRAP_2PI(yaw_pos_err);
 
-	pitch_vel_err = des_rates.pitch - egd.x; //vel err (des speed - measured gyro speed)
-	roll_vel_err = des_rates.roll - egd.y;
+	roll_integral = roll_integral + roll_pos_err*dt;
+	pitch_integral = pitch_integral + pitch_pos_err*dt;
+
+	BOUND_VARIABLE(roll_integral, (float)-1, (float)1);
+	BOUND_VARIABLE(pitch_integral, (float)-1, (float)1);
+
+	des_rates.roll = roll_p*roll_pos_err + roll_i*roll_integral;
+	des_rates.pitch = pitch_p*pitch_pos_err + pitch_i*pitch_integral;
+
+	//rotate coordinate frame by 45 degrees to align pitch and roll axes to prop arms
+	//TODO limit vel_err to max
+	pitch_vel_err = des_rates.pitch - (0.7071*egd.x + 0.7071*egd.y); //vel err (des speed - measured gyro speed)
+	roll_vel_err = des_rates.roll - (0.7071*egd.y - 0.7071*egd.x);
 	yaw_vel_err = des_rates.yaw - egd.z;
 
 	pitch_acc_err = des_ang_acc.pitch - est_ang_acc.pitch; //(0 - est_accs) acceleration error
 	roll_acc_err = des_ang_acc.roll - est_ang_acc.roll;
 	yaw_acc_err = des_ang_acc.yaw - est_ang_acc.yaw;
 
+	//band limit position and speed
+	BOUND_VARIABLE(pitch_pos_err, (float)-max_pos_err, (float)max_pos_err);
+	BOUND_VARIABLE(roll_pos_err, (float)-max_pos_err, (float)max_pos_err);
+
+	BOUND_VARIABLE(pitch_vel_err, (float)-max_vel_err, (float)max_vel_err);
+	BOUND_VARIABLE(roll_vel_err, (float)-max_vel_err, (float)max_vel_err);
+
+
 	//p-d-dd controller application
 	pitch_thrust_delta =
-			pitch_p*pitch_pos_err +
+			//pitch_p*pitch_pos_err +
 			pitch_d*pitch_vel_err +
 			pitch_dd*pitch_acc_err;
 
 	roll_thrust_delta =
-				roll_p*roll_pos_err +
+				//roll_p*roll_pos_err +
 				roll_d*roll_vel_err +
 				roll_dd*roll_acc_err;
 
 	yaw_thrust_delta =
-				yaw_p*yaw_pos_err +
+				//yaw_p*yaw_pos_err +
 				yaw_d*yaw_vel_err +
 				yaw_dd*yaw_acc_err;
 
-	set_motor_thrust_des({
+	//old as of mar16 (pre roll pitch 45 rotation
+	/*set_motor_thrust_des({
 		base_thrust + pitch_thrust_delta + roll_thrust_delta + yaw_thrust_delta,//FL
 		base_thrust + pitch_thrust_delta - roll_thrust_delta - yaw_thrust_delta,//FR
 		base_thrust - pitch_thrust_delta - roll_thrust_delta + yaw_thrust_delta,//RR
 		base_thrust - pitch_thrust_delta + roll_thrust_delta - yaw_thrust_delta//RL
+	});*/
+
+	front_thrust = base_thrust + pitch_thrust_delta + yaw_thrust_delta;
+	right_thrust = base_thrust - roll_thrust_delta - yaw_thrust_delta;
+	rear_thrust = base_thrust - pitch_thrust_delta + yaw_thrust_delta;
+	left_thrust = base_thrust + roll_thrust_delta - yaw_thrust_delta;
+
+	//bound to max values
+	BOUND_VARIABLE(front_thrust, min_thrust, max_thrust);
+	BOUND_VARIABLE(rear_thrust, min_thrust, max_thrust);
+	BOUND_VARIABLE(left_thrust, min_thrust, max_thrust);
+	BOUND_VARIABLE(right_thrust, min_thrust, max_thrust);
+
+	//change this before 3:30
+	set_motor_thrust_des({
+		front_thrust,//FL (now Front)
+		right_thrust,//FR (now Right)
+		rear_thrust,//RR (now Rear)
+		left_thrust//RL (now Left)
 	});
+
+	//write rates to mutex for printing
+	set_craft_rates_des({des_rates.roll, des_rates.pitch, des_rates.yaw});
 
 
 	//set last values

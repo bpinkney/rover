@@ -15,6 +15,7 @@ private:
 	float acc_trust;
 
 	float pitch, roll, yaw; //(x, y, z), check the flyer and imu axes if you need to verify
+	float pitch_rot, roll_rot, yaw_rot; //rotations away from base frame if required
 
 	float dt; //make sure to change this period if the calling frequency changes (could probably link it up)
 
