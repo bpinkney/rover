@@ -88,21 +88,16 @@ struct top_vector_t{//__attribute__ ((__packed__)) {
 struct side_vector_t{//__attribute__ ((__packed__)) {
     float magnitude;
     float trust;
-    float a;
-    float b;
-    float a_trust;
-    float b_trust;
+    float u;
+    float v;
 };
 
 struct bottom_vector_t{//__attribute__ ((__packed__)) {
     float magnitude;
     float trust;
-    float a;
-	float b;
-	float c;
-	float a_trust;
-	float b_trust;
-	float c_trust;
+    float u;
+	float v;
+	float w;
 };
 
 

@@ -12,6 +12,7 @@
 #include "flight_controller.h"
 #include "orientation_estimator.h"
 #include "IMU.h"
+#include "nav_sensors.h"
 
 //define thread pointers
 Thread *core_sensors_thread;
@@ -39,6 +40,8 @@ orientation_estimator_t orientation_estimator;
 
 //flight_controller
 flight_controller_t flight_controller;
+
+
 
 //ofstream log_fp;
 
@@ -349,9 +352,9 @@ void run_motor_control_thread(void const *args){
 
 			//actually sets the throttle to the ESC.
 			m1(); //Front (FL)
-			//m2(); //Right (FR)
+			m2(); //Right (FR)
 			m3(); //Rear (RR)
-			//m4(); //Left (RL)
+			m4(); //Left (RL)
 
 			Thread::wait(10);  //20ms is the default period of the ESC pwm; the ESC may not run faster.
 
@@ -384,6 +387,21 @@ void run_flight_control_thread(void const *args){
 }
 
 void run_nav_sensor_thread(void const *args){
+	rs.printf("Init IR Sensors\n\r");
+	//nav sensor handler
+	nav_sensors_t nav_sensors;
+	Thread::wait(200);
+	nav_sensors.init();
+	Thread::wait(2000);
+	//float o_1, o_2, o_3, o_4, o_5, o_6, o_7, o_8;
+
+	while(1){
+		nav_sensors.get_side_geometries();
+		Thread::wait(10);
+	}
+
+
+
 	while(true){Thread::wait(osWaitForever);}
 }
 
@@ -401,14 +419,14 @@ void run_remote_control_thread(void const *args){
 	//LR triggers: zx
 	//Select Start: kl
 
-	float pitch_p = 2.1;//0.18;
-	float pitch_d = 0.03;//0.025;
+	float pitch_p = 2.82;//0.18;
+	float pitch_d = 0.024;//0.025;
 
 	float roll_p = 0;//0.13;
 	float roll_d = 0;//0.027;
 	float roll_i = 0;
 
-	float pitch_dd = 0.0042;
+	float pitch_dd = 0.003;
 	float roll_dd = 0;
 
 	float des_pitch;
@@ -438,24 +456,24 @@ void run_remote_control_thread(void const *args){
 
 
 			}else if(c == 'x'){
-				des_roll += 10/57.29578;
-				flight_controller.set_test_vars(0, des_roll, 0);
-				rs.printf("%d: pitch des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
+				des_roll += 25/57.29578;
+				flight_controller.set_test_vars(0, 0, des_roll);
+				rs.printf("%d: yaw des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
 
 			}else if(c == 'z'){
-				des_roll -= 10/57.29578;
-				flight_controller.set_test_vars(0, des_roll, 0);
-				rs.printf("%d: pitch des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
+				des_roll -= 25/57.29578;
+				flight_controller.set_test_vars(0, 0, des_roll);
+				rs.printf("%d: yaw des is now: %f deg/s\n\r", sw_uptime,des_roll*57.29578);
 				//d
 			}else if(c == 'h'){//A (Y)
-				pitch_d += 0.0005;
+				pitch_d += 0.002;
 				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
 
 			}
 			else if(c == 'f'){//(A) Y
-				pitch_d -= 0.0005;
+				pitch_d -= 0.002;
 				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				rs.printf("%d: pitch D is now: %f\n\r", sw_uptime,pitch_d);
@@ -476,7 +494,7 @@ void run_remote_control_thread(void const *args){
 			//roll_i+=0.005;
 			//flight_controller.update_roll_i(roll_i);
 			//rs.printf("%d: roll I is now: %f\n\r", sw_uptime,roll_i);
-			pitch_dd += 0.00005;
+			pitch_dd += 0.0002;
 			flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
 			rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
 			//pitch_p += 0.005;
@@ -489,8 +507,8 @@ void run_remote_control_thread(void const *args){
 			//roll_i-=0.005;
 			//flight_controller.update_roll_i(roll_i);
 			//rs.printf("%d: roll I is now: %f\n\r", sw_uptime,roll_i);
-			pitch_dd -= 0.00005;
-			flight_controller.update_pitch_pddd(-1, -1, pitch_dd);
+			pitch_dd -= 0.0002;
+			flight_controller.update_pitch_pddd(-1,-1, pitch_dd);
 			rs.printf("%d: pitch DD is now: %f\n\r", sw_uptime,pitch_dd);
 			//pitch_p -= 0.005;
 			//flight_controller.update_pitch_pddd(pitch_p,-1, -1);
@@ -531,13 +549,13 @@ void run_remote_control_thread(void const *args){
 				rs.printf("%d: roll DD is now: %f\n\r", sw_uptime,roll_dd);
 			}*/
 			else if(c == 'a'){ //(D) A
-				pitch_p -= 0.005;
+				pitch_p -= 0.1;
 				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(pitch_p,-1, -1);
 				rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
 			}
 			else if(c == 'd'){ //D (A)
-				pitch_p += 0.005;
+				pitch_p += 0.1;
 				//flight_controller.update_pitch_pddd(-1, pitch_d, -1);
 				flight_controller.update_pitch_pddd(pitch_p, -1, -1);
 				rs.printf("%d: pitch P is now: %f\n\r", sw_uptime,pitch_p);
@@ -587,6 +605,13 @@ void run_flight_logger_thread(void const *args){
 	craft_rates_t rates_des = {0,0,0};
 	craft_accs_t accs_est = {0,0,0};
 	motor_thrust_des_t motor_thrust = {0,0,0,0};
+
+	//IR sensors
+	side_vector_t lf = {0,0,0,0};
+	side_vector_t rf = {0,0,0,0};
+	side_vector_t rb = {0,0,0,0};
+	side_vector_t lb = {0,0,0,0};
+
 	Thread::wait(2000);
 	rs.printf("Flight Log Starting...\n\r");
 
@@ -612,8 +637,8 @@ void run_flight_logger_thread(void const *args){
 			date_stamp,
 			"Flight Log #", log_number,
 			"ROVER: 'Rover Observation Vehicle for Enclosed Regions'",
-			"Flight Log - Format Version '0.6'",
-			"LEGEND:[rover_t, rover_status, [rover_orient_est], [rover_orient_des],[rover_rates_des],[rover_accs_est], [rover_ex_gyro], rover_ex_gyro_temp, [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag], [rover_thrusts_des]");
+			"Flight Log - Format Version '0.7'",
+			"LEGEND:[rover_t, rover_status, [rover_orient_est], [rover_orient_des],[rover_rates_des],[rover_accs_est], [rover_ex_gyro], rover_ex_gyro_temp, [rover_ex_acc], [rover_int_acc], [rover_ex_mag], [rover_int_mag], [rover_thrusts_des], [ir_geometries_lf_rf_rb_lb]");
 
 	log_fp = fopen(filename, "w");
 	if (log_fp == NULL || sd_ready!=0) {
@@ -647,8 +672,13 @@ void run_flight_logger_thread(void const *args){
 				get_craft_accs_est(&accs_est, sizeof(accs_est));
 				get_motor_thrust_des(&motor_thrust, sizeof(motor_thrust));
 
+				get_lf_ir_pair(&lf, sizeof(lf));
+				get_rf_ir_pair(&rf, sizeof(rf));
+				get_rb_ir_pair(&rb, sizeof(rb));
+				get_lb_ir_pair(&lb, sizeof(lb));
+
 				sprintf(log_buffer,
-						"DATA[%d, 0, [%f,%f,%f],[%f,%f,%f],[%f,%f,%f],[%f,%f,%f], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f],[%f,%f,%f,%f]]\n",
+						"DATA[%d, 0, [%f,%f,%f],[%f,%f,%f],[%f,%f,%f],[%f,%f,%f], [%f, %f, %f], %d, [%f, %f, %f], [%f, %f, %f], [%f, %f, %f], [%f, %f, %f],[%f,%f,%f,%f],[%f,%f,%f,%f],[%f,%f,%f,%f],[%f,%f,%f,%f],[%f,%f,%f,%f]]\n",
 						sw_uptime,
 						orient_est.roll, orient_est.pitch, orient_est.yaw,
 						orient_des.roll, orient_des.pitch, orient_des.yaw,
@@ -660,7 +690,11 @@ void run_flight_logger_thread(void const *args){
 						iad.x, iad.y, iad.z,
 						emd.x, emd.y, emd.z,
 						imd.x, imd.y, imd.z,
-						motor_thrust.fl, motor_thrust.fr, motor_thrust.rr, motor_thrust.rl);
+						motor_thrust.fl, motor_thrust.fr, motor_thrust.rr, motor_thrust.rl,
+						lf.magnitude, lf.trust, lf.u, lf.v,
+						rf.magnitude, rf.trust, rf.u, rf.v,
+						rb.magnitude, rb.trust, rb.u, rb.v,
+						lb.magnitude, lb.trust, lb.u, lb.v);
 				//rs.printf(log_buffer);rs.printf("\r");
 				log_fp = fopen(filename, "a");
 				fprintf(log_fp, log_buffer);
@@ -722,7 +756,7 @@ int start_operating_threads(){
 
 	// collects data from navigation sensors and stores
 	// them to global instances  = new Thread(mutexed)
-	nav_sensor_thread = new Thread(run_nav_sensor_thread, NULL, osPriorityAboveNormal);
+	//nav_sensor_thread = new Thread(run_nav_sensor_thread, NULL, osPriorityAboveNormal);
 
 
 
@@ -735,7 +769,7 @@ int start_operating_threads(){
 
 	// logs data at a quick rate to the onboard SD card (needs a high thread priority to obtain sdcard pin write lock
 	//  = new Thread(mutexed consumer to most producer threads)
-	flight_logger_thread = new Thread(run_flight_logger_thread, NULL, osPriorityRealtime, (DEFAULT_STACK_SIZE * 2.25));
+	flight_logger_thread = new Thread(run_flight_logger_thread, NULL, osPriorityRealtime, (DEFAULT_STACK_SIZE * 5));
 
 	// grabs preformatted log data as produced by flight_logger_thread
 	// and sends it over telemetry radio  = new Thread(tx, mutexed serial)
@@ -757,6 +791,7 @@ int main() {
 	remote_control_thread = new Thread(run_remote_control_thread, NULL, osPriorityRealtime);
 	Thread::wait(10000);
 	rs.printf("\r\n\nSTART\r\n");
+	//pc.printf("start\n\r");
 
 
 	start_operating_threads();

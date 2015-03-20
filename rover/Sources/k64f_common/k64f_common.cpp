@@ -28,6 +28,12 @@ Mutex rates_des_mutex;
 Mutex accs_est_mutex;
 Mutex motor_thrust_des_mutex;
 
+//ir mutxes
+Mutex lf_ir_pair_mutex;
+Mutex rf_ir_pair_mutex;
+Mutex rb_ir_pair_mutex;
+Mutex lb_ir_pair_mutex;
+
 //data struct global iterations
 k64f_acc_data_t k64f_acc_data = {0,0,0};
 k64f_mag_data_t k64f_mag_data = {0,0,0};
@@ -40,6 +46,12 @@ craft_orientation_des_t craft_orientation_des = {0,0,0};
 craft_rates_t craft_rates_des = {0,0,0};
 craft_accs_t craft_accs_est = {0,0,0};
 motor_thrust_des_t motor_thrust_des = {0,0,0,0};
+
+//ir sensors
+side_vector_t lf_ir_pair = {0,0,0,0};
+side_vector_t rf_ir_pair = {0,0,0,0};
+side_vector_t rb_ir_pair = {0,0,0,0};
+side_vector_t lb_ir_pair = {0,0,0,0};
 
 //data struct getters and setters
 void get_k64f_acc_data(void* buffer, int size){
@@ -171,6 +183,51 @@ void set_motor_thrust_des(motor_thrust_des_t value){
 	motor_thrust_des_mutex.unlock();
 }
 
+
+//ir getters and setters
+void get_lf_ir_pair(void* buffer, int size){
+	lf_ir_pair_mutex.lock();
+    memcpy(buffer, &lf_ir_pair, size);
+    lf_ir_pair_mutex.unlock();
+}
+void set_lf_ir_pair(side_vector_t value){
+	lf_ir_pair_mutex.lock();
+	lf_ir_pair = value;
+	lf_ir_pair_mutex.unlock();
+}
+
+void get_rf_ir_pair(void* buffer, int size){
+	rf_ir_pair_mutex.lock();
+    memcpy(buffer, &rf_ir_pair, size);
+    rf_ir_pair_mutex.unlock();
+}
+void set_rf_ir_pair(side_vector_t value){
+	rf_ir_pair_mutex.lock();
+	rf_ir_pair = value;
+	rf_ir_pair_mutex.unlock();
+}
+
+void get_rb_ir_pair(void* buffer, int size){
+	rb_ir_pair_mutex.lock();
+    memcpy(buffer, &rb_ir_pair, size);
+    rb_ir_pair_mutex.unlock();
+}
+void set_rb_ir_pair(side_vector_t value){
+	rb_ir_pair_mutex.lock();
+	rb_ir_pair = value;
+	rb_ir_pair_mutex.unlock();
+}
+
+void get_lb_ir_pair(void* buffer, int size){
+	lb_ir_pair_mutex.lock();
+    memcpy(buffer, &lb_ir_pair, size);
+    lb_ir_pair_mutex.unlock();
+}
+void set_lb_ir_pair(side_vector_t value){
+	lb_ir_pair_mutex.lock();
+	lb_ir_pair = value;
+	lb_ir_pair_mutex.unlock();
+}
 
 
 //macros

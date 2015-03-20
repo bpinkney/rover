@@ -32,8 +32,6 @@ extern Serial rs;
 extern FXOS8700Q_acc k64f_acc; // Proper Ports and I2C Address for K64F Freedom board
 extern FXOS8700Q_mag k64f_mag; // Proper Ports and I2C Address for K64F Freedom board
 
-
-
 //sd card
 //extern SDFileSystem sd;
 
@@ -82,6 +80,16 @@ void set_craft_accs_est(craft_accs_t value);
 
 void get_motor_thrust_des(void* buffer, int size);
 void set_motor_thrust_des(motor_thrust_des_t value);
+
+//ir sensors
+void get_lf_ir_pair(void* buffer, int size);
+void set_lf_ir_pair(side_vector_t value);
+void get_rf_ir_pair(void* buffer, int size);
+void set_rf_ir_pair(side_vector_t value);
+void get_rb_ir_pair(void* buffer, int size);
+void set_rb_ir_pair(side_vector_t value);
+void get_lb_ir_pair(void* buffer, int size);
+void set_lb_ir_pair(side_vector_t value);
 
 //macros
 #define LP_FILT(var, new_val, N)  \

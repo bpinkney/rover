@@ -133,7 +133,7 @@ public:
 	void update_roll_pddd(float p, float d, float dd);
 	void update_yaw_pddd(float p, float d, float dd);
 
-	void update_roll_i(float i);
+	void update_yaw_i(float i);
 	/*void update_roll_pids(float p, float i, float d);
 	void update_pitch_pids(float p, float i, float d);
 	void update_yaw_pids(float p, float i, float d);
